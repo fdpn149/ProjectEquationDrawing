@@ -8,11 +8,16 @@ using std::string;
 
 class Manager
 {
-    Parser parser;
-    Storage storage;
+	Parser parser;
+	Storage storage;
+	Viewer* viewer;
 public:
-    Manager(){}
-    void parseInput(string input) { parser.parseInput(input, storage); }
+	Manager();
+	~Manager();
+	void start();
+	void parseInput(string input);
 };
+
+extern Manager manager;
 
 #endif // MANAGER_H

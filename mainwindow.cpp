@@ -4,6 +4,7 @@
 #include <QtCharts/QLogValueAxis>
 #include <QtCharts/QValueAxis>
 #include <QLineEdit>
+#include <manager.h>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)

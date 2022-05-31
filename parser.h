@@ -2,13 +2,15 @@
 #define PARSER_H
 #include "storage.h"
 #include <iostream>
+#include <map>
+using std::map;
 using std::string;
 
 class Parser
 {
 public:
-    Parser(){}
-    void parseInput(string input, Storage& storage);
+    Parser();
+    int parseInput(string input, Storage& storage);
 };
 
 #endif // PARSER_H
