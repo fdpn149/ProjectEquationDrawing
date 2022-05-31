@@ -133,6 +133,7 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mainwindow.cpp" />
+    <ClCompile Include="manager.cpp" />
     <ClCompile Include="parser.cpp" />
     <ClCompile Include="storage.cpp" />
     <ClCompile Include="viewer.cpp" />
@@ -148,6 +149,7 @@
       
       
     </QtMoc>
+    <ClInclude Include="manager.h" />
     <ClInclude Include="parser.h" />
     <ClInclude Include="storage.h" />
     <ClInclude Include="viewer.h" />

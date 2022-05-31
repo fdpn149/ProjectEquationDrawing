@@ -37,7 +37,7 @@ MainWindow::MainWindow(QWidget *parent)
     //![4]
     ui->horizontalLayout_2->addWidget(chartView);
 
-    connect(ui->listWidget->itemDelegate(), &QAbstractItemDelegate::commitData, this, &MainWindow::OnLstItemsCommitData);
+    connect(ui->listWidget->itemDelegate(), &QAbstractItemDelegate::commitData, this, &MainWindow::list_commitData);
 }
 
 MainWindow::~MainWindow()
@@ -54,16 +54,16 @@ void MainWindow::on_addButton_clicked()
     ui->listWidget->addItem(item);
 }
 
-void MainWindow::OnLstItemsCommitData(QWidget* pLineEdit)
+void MainWindow::list_commitData(QWidget* pLineEdit)
 {
-    QString strNewText = reinterpret_cast<QLineEdit*>(pLineEdit)->text();
-    int nRow = ui->listWidget->currentRow();
-    if (strNewText.isEmpty())
+    QString listText = reinterpret_cast<QLineEdit*>(pLineEdit)->text();
+    int nowRow = ui->listWidget->currentRow();
+    if (listText.isEmpty())
     {
-        ui->listWidget->takeItem(nRow);
+        ui->listWidget->takeItem(nowRow);
     }
     else
     {
-
+        parser.parseInput(listText.toStdString());  //解析輸入並存起來
     }
 }

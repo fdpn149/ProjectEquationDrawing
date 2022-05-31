@@ -11,12 +11,14 @@ CONFIG += c++17
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
+    manager.cpp \
     parser.cpp \
     storage.cpp \
     viewer.cpp
 
 HEADERS += \
     mainwindow.h \
+    manager.h \
     parser.h \
     storage.h \
     viewer.h

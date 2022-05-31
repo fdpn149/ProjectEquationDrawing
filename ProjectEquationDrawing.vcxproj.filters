@@ -43,6 +43,9 @@
     <ClCompile Include="mainwindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="parser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -57,6 +60,9 @@
     <QtMoc Include="mainwindow.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <ClInclude Include="manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="parser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
