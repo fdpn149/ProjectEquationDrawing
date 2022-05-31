@@ -134,6 +134,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mainwindow.cpp" />
     <ClCompile Include="parser.cpp" />
+    <ClCompile Include="storage.cpp" />
     <ClCompile Include="viewer.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -148,6 +149,7 @@
       
     </QtMoc>
     <ClInclude Include="parser.h" />
+    <ClInclude Include="storage.h" />
     <ClInclude Include="viewer.h" />
   </ItemGroup>
   <ItemGroup>

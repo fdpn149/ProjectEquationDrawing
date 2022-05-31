@@ -1,5 +1,4 @@
 #include "mainwindow.h"
-
 #include <QtCharts/QChartView>
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QLogValueAxis>
@@ -62,5 +61,9 @@ void MainWindow::OnLstItemsCommitData(QWidget* pLineEdit)
     if (strNewText.isEmpty())
     {
         ui->listWidget->takeItem(nRow);
+    }
+    else
+    {
+
     }
 }

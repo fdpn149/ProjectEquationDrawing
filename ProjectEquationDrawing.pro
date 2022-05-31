@@ -12,11 +12,13 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     parser.cpp \
+    storage.cpp \
     viewer.cpp
 
 HEADERS += \
     mainwindow.h \
     parser.h \
+    storage.h \
     viewer.h
 
 FORMS += \

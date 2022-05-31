@@ -7,6 +7,9 @@
 #include <QtCharts/QLogValueAxis>
 #include <QtCharts/QValueAxis>
 #include "ui_mainwindow.h"
+#include "parser.h"
+#include "storage.h"
+#include "viewer.h"
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -24,7 +27,6 @@ private slots:
     void OnLstItemsCommitData(QWidget* pLineEdit);
 private:
     Ui::MainWindow *ui;
-
-    QChartView* ChartView;
+    Parser parser;
 };
 #endif // MAINWINDOW_H
