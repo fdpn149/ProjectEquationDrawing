@@ -1,12 +1,15 @@
 #include "mainwindow.h"
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QMainWindow>
 
-#include <QApplication>
+QT_USE_NAMESPACE
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    QApplication a(argc, argv);
-    MainWindow w;
-    w.show();
-    return a.exec();
+    QApplication app(argc, argv);
+    MainWindow window;
+    window.resize(987, 600);
+    window.show();
+
+    return app.exec();
 }
-//
