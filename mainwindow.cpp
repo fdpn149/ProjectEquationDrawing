@@ -64,6 +64,6 @@ void MainWindow::list_commitData(QWidget* pLineEdit)
     }
     else
     {
-        parser.parseInput(listText.toStdString());  //解析輸入並存起來
+        manager.parseInput(listText.toStdString());  //解析輸入並存起來
     }
 }
