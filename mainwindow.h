@@ -23,6 +23,8 @@ public:
 private slots:
     void on_addButton_clicked();
     void list_commitData(QWidget* pLineEdit);
+    void on_listWidget_itemDoubleClicked(QListWidgetItem *item);
+
 private:
 };
 #endif // MAINWINDOW_H

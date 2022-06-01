@@ -1,5 +1,5 @@
 #include "parser.h"
-
+vector<string> Parser::part_input;
 Parser::Parser()
 {
 
@@ -23,6 +23,7 @@ int Parser::parseInput(string input, Storage& storage)
 	}
 	if (v1.empty() || v1 == "sin" || v1 == "cos") return -1;  //若v1為空字串，回傳-1
 
+
 	int par_count = 0;  //計算上下括號數
 	int next_code = 123;  //下一個有效字元的代碼 #初始為(-0axs
 	int now_code = 0;
@@ -35,6 +36,7 @@ int Parser::parseInput(string input, Storage& storage)
 			par_count++;
 			now_code = 1;
 			next_code = 123;
+			part_input.push_back("(");
 			continue;
 		}
 		//若是負號或減號
@@ -42,6 +44,7 @@ int Parser::parseInput(string input, Storage& storage)
 		{
 			now_code = 2;
 			next_code = 121;
+			part_input.push_back("-");
 			continue;
 		}
 		//加乘除冪
@@ -50,13 +53,34 @@ int Parser::parseInput(string input, Storage& storage)
 		{
 			now_code = 4;
 			next_code = 121;
+			part_input.push_back(string(1, input.at(i)));
 			continue;
 		}
-		//整數
+		//數字
 		if ((next_code & 8) >= 1 && std::isdigit(input.at(i)))
 		{
+			int from = i;
+
+			bool flag = false;
+			//將i移到不是數字的地方
+			while (i < input.length() && (std::isdigit(input.at(i)) || input.at(i) == '.'))
+			{
+				if (!flag && input.at(i) == '.')
+					flag = true;
+				else if (flag && input.at(i) == '.')
+					return -1;
+				i++;
+			}
+			if (i-1 >= 0 && input.at(i-1) == '.')
+				return -1;
+
 			now_code = 8;
 			next_code = 398;
+
+			string str = input.substr(from, i - from);  //截取
+			i--;
+
+			part_input.push_back(str);
 			continue;
 		}
 		//英文(sin/cos=16, x=32, 其它=64)
@@ -67,6 +91,7 @@ int Parser::parseInput(string input, Storage& storage)
 			{
 				if ((next_code & 16) >= 1 && i + 3 < input.length() && input.at(i + 3) == '(')  //若sin/cos的下個字為(
 				{
+					part_input.push_back(input.substr(i, 3));
 					i += 2;
 					now_code = 16;
 					next_code = 1;
@@ -85,6 +110,7 @@ int Parser::parseInput(string input, Storage& storage)
 				{
 					now_code = 32;
 					next_code = 262;
+					part_input.push_back("x");
 					continue;
 				}
 			}
@@ -100,6 +126,7 @@ int Parser::parseInput(string input, Storage& storage)
 
 			//TODO:尋找變數是否存在
 
+			part_input.push_back(name);
 			now_code = 64;
 			next_code = 262;
 			continue;
@@ -109,6 +136,7 @@ int Parser::parseInput(string input, Storage& storage)
 		{
 			now_code = 128;
 			next_code = 8;
+			part_input.push_back(".");
 			continue;
 		}
 		//右括號
@@ -120,6 +148,7 @@ int Parser::parseInput(string input, Storage& storage)
 
 			now_code = 256;
 			next_code = 262;
+			part_input.push_back(")");
 			continue;
 		}
 
@@ -129,8 +158,11 @@ int Parser::parseInput(string input, Storage& storage)
 	if (par_count > 0)
 		return -1;
 
-	if((now_code & 488) >= 1)
-		return 0;
 
-	return -1;
+
+	if ((now_code & 488) == 0)
+		return -1;
+
+
+	return 0;
 }

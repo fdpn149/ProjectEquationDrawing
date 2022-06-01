@@ -35,7 +35,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     QChartView* chartView = new QChartView(chart);
     chartView->setRenderHint(QPainter::Antialiasing);
-    //![4]
     ui->horizontalLayout_2->addWidget(chartView);
 
     connect(ui->listWidget->itemDelegate(), &QAbstractItemDelegate::commitData, this, &MainWindow::list_commitData);
@@ -49,22 +48,30 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_addButton_clicked()
 {
-    QListWidgetItem* item = new QListWidgetItem("");
-    item->setFlags(item->flags() | Qt::ItemIsEditable);
-    item->setFont(QFont("Microsoft JhengHei UI", 20));
-    ui->listWidget->addItem(item);
+    manager.addNewItem();
 }
 
 void MainWindow::list_commitData(QWidget* pLineEdit)
 {
-    QString listText = reinterpret_cast<QLineEdit*>(pLineEdit)->text();
+    //QString listText = reinterpret_cast<QLineEdit*>(pLineEdit)->text();
+    
     int nowRow = ui->listWidget->currentRow();
+    QString listText = ui->listWidget->item(nowRow)->text();
+
     if (listText.isEmpty())
     {
         ui->listWidget->takeItem(nowRow);
+        manager.removeItem(nowRow);
     }
     else
     {
-        manager.parseInput(listText.toStdString());  //解析輸入並存起來
+        manager.parseInput(listText.toStdString());
+        manager.changeIcon(ui->listWidget->item(nowRow), nowRow);
     }
 }
+void MainWindow::on_listWidget_itemDoubleClicked(QListWidgetItem *item)
+{
+    int nowRow = ui->listWidget->currentRow();
+    manager.editItem(item,nowRow);
+}
+

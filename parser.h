@@ -2,8 +2,8 @@
 #define PARSER_H
 #include "storage.h"
 #include <iostream>
-#include <map>
-using std::map;
+#include <vector>
+using std::vector;
 using std::string;
 
 class Parser
@@ -11,6 +11,7 @@ class Parser
 public:
     Parser();
     int parseInput(string input, Storage& storage);
+    static vector<string> part_input;
 };
 
 #endif // PARSER_H
