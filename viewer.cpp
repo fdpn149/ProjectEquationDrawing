@@ -1,4 +1,4 @@
-#include "viewer.h"
+ï»¿#include "viewer.h"
 #include "mainwindow.h"
 
 Viewer::Viewer()
@@ -35,7 +35,7 @@ void Viewer::addItem(QColor color)
 
 void Viewer::editItem(QListWidgetItem* item, QColor color)
 {
-	item->setText("");  //³o¸Ì¥u¯à§â­ì¦³ªº¿é¤J²M±¼
+	item->setText("");  //é€™è£¡åªèƒ½æŠŠåŸæœ‰çš„è¼¸å…¥æ¸…æ‰
 	QPixmap pixmap(40, 40);
 	pixmap.fill(color);
 	QPainter painter(&pixmap);

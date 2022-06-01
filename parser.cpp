@@ -1,4 +1,4 @@
-#include "parser.h"
+ï»¿#include "parser.h"
 vector<string> Parser::part_input;
 Parser::Parser()
 {
@@ -7,30 +7,30 @@ Parser::Parser()
 
 int Parser::parseInput(string input, Storage& storage)
 {
-	if (!std::isalpha(input.at(0))) return -1;  //­Y¿é¤Jªº²Ä1¦r¤£¬O­^¤å¡A¦^¶Ç-1
+	if (!std::isalpha(input.at(0))) return -1;  //è‹¥è¼¸å…¥çš„ç¬¬1å­—ä¸æ˜¯è‹±æ–‡ï¼Œå›å‚³-1
 
-	string v1 = "";  //¶}ÀYªºÅÜ¼Æ¦WºÙ
-	int eq_pos;  //µ¥¸¹ªº¦ì¸m
+	string v1 = "";  //é–‹é ­çš„è®Šæ•¸åç¨±
+	int eq_pos;  //ç­‰è™Ÿçš„ä½ç½®
 
-	//§äµ¥¸¹
+	//æ‰¾ç­‰è™Ÿ
 	for (eq_pos = 0; eq_pos < input.size() - 1; eq_pos++)
 	{
-		if (input.at(eq_pos) == '=')  //­Y¹J¨ì=
+		if (input.at(eq_pos) == '=')  //è‹¥é‡åˆ°=
 		{
 			v1 = input.substr(0, eq_pos);
 			break;
 		}
 	}
-	if (v1.empty() || v1 == "sin" || v1 == "cos") return -1;  //­Yv1¬°ªÅ¦r¦ê¡A¦^¶Ç-1
+	if (v1.empty() || v1 == "sin" || v1 == "cos") return -1;  //è‹¥v1ç‚ºç©ºå­—ä¸²ï¼Œå›å‚³-1
 
 
-	int par_count = 0;  //­pºâ¤W¤U¬A¸¹¼Æ
-	int next_code = 123;  //¤U¤@­Ó¦³®Ä¦r¤¸ªº¥N½X #ªì©l¬°(-0axs
+	int par_count = 0;  //è¨ˆç®—ä¸Šä¸‹æ‹¬è™Ÿæ•¸
+	int next_code = 123;  //ä¸‹ä¸€å€‹æœ‰æ•ˆå­—å…ƒçš„ä»£ç¢¼ #åˆå§‹ç‚º(-0axs
 	int now_code = 0;
 
 	for (int i = eq_pos + 1; i < input.size(); i++)
 	{
-		//­Y¬O¥ª¬A¸¹
+		//è‹¥æ˜¯å·¦æ‹¬è™Ÿ
 		if ((next_code & 1) >= 1 && input.at(i) == '(')
 		{
 			par_count++;
@@ -39,7 +39,7 @@ int Parser::parseInput(string input, Storage& storage)
 			part_input.push_back("(");
 			continue;
 		}
-		//­Y¬O­t¸¹©Î´î¸¹
+		//è‹¥æ˜¯è² è™Ÿæˆ–æ¸›è™Ÿ
 		if ((next_code & 2) >= 1 && input.at(i) == '-')
 		{
 			now_code = 2;
@@ -47,7 +47,7 @@ int Parser::parseInput(string input, Storage& storage)
 			part_input.push_back("-");
 			continue;
 		}
-		//¥[­¼°£¾­
+		//åŠ ä¹˜é™¤å†ª
 		if ((next_code & 4) >= 1 && (input.at(i) == '+' || input.at(i) == '*'
 			|| input.at(i) == '/' || input.at(i) == '^'))
 		{
@@ -56,13 +56,13 @@ int Parser::parseInput(string input, Storage& storage)
 			part_input.push_back(string(1, input.at(i)));
 			continue;
 		}
-		//¼Æ¦r
+		//æ•¸å­—
 		if ((next_code & 8) >= 1 && std::isdigit(input.at(i)))
 		{
 			int from = i;
 
 			bool flag = false;
-			//±Ni²¾¨ì¤£¬O¼Æ¦rªº¦a¤è
+			//å°‡iç§»åˆ°ä¸æ˜¯æ•¸å­—çš„åœ°æ–¹
 			while (i < input.length() && (std::isdigit(input.at(i)) || input.at(i) == '.'))
 			{
 				if (!flag && input.at(i) == '.')
@@ -77,19 +77,19 @@ int Parser::parseInput(string input, Storage& storage)
 			now_code = 8;
 			next_code = 398;
 
-			string str = input.substr(from, i - from);  //ºI¨ú
+			string str = input.substr(from, i - from);  //æˆªå–
 			i--;
 
 			part_input.push_back(str);
 			continue;
 		}
-		//­^¤å(sin/cos=16, x=32, ¨ä¥¦=64)
+		//è‹±æ–‡(sin/cos=16, x=32, å…¶å®ƒ=64)
 		if ((next_code & 112) >= 1 && std::isalpha(input.at(i)))
 		{
-			//sin/cos§PÂ_
+			//sin/cosåˆ¤æ–·
 			if (input.substr(i, 3) == "sin" || input.substr(i, 3) == "cos")
 			{
-				if ((next_code & 16) >= 1 && i + 3 < input.length() && input.at(i + 3) == '(')  //­Ysin/cosªº¤U­Ó¦r¬°(
+				if ((next_code & 16) >= 1 && i + 3 < input.length() && input.at(i + 3) == '(')  //è‹¥sin/cosçš„ä¸‹å€‹å­—ç‚º(
 				{
 					part_input.push_back(input.substr(i, 3));
 					i += 2;
@@ -97,15 +97,15 @@ int Parser::parseInput(string input, Storage& storage)
 					next_code = 1;
 					continue;
 				}
-				else if (i + 3 < input.length() && !std::isalpha(input.at(i + 3)) && !std::isdigit(input.at(i + 3)))  //­Y¤U­Ó¦r¤£¬°­^¤å©Î¼Æ¦r(¤£¬OÅÜ¼Æ)
+				else if (i + 3 < input.length() && !std::isalpha(input.at(i + 3)) && !std::isdigit(input.at(i + 3)))  //è‹¥ä¸‹å€‹å­—ä¸ç‚ºè‹±æ–‡æˆ–æ•¸å­—(ä¸æ˜¯è®Šæ•¸)
 				{
 					return -1;
 				}
 			}
-			//x§PÂ_
+			//xåˆ¤æ–·
 			else if (input.at(i) == 'x')
 			{
-				//­Y¬°³æ¯Âªºx
+				//è‹¥ç‚ºå–®ç´”çš„x
 				if ((next_code & 32) >= 1 && (i + 1 >= input.length() || !std::isalnum(input.at(i + 1))))
 				{
 					now_code = 32;
@@ -115,23 +115,23 @@ int Parser::parseInput(string input, Storage& storage)
 				}
 			}
 
-			//¨ä¥¦ÅÜ¼Æ§PÂ_//
+			//å…¶å®ƒè®Šæ•¸åˆ¤æ–·//
 			int from = i;
 
-			//±Ni²¾¨ì¤£¬OÅÜ¼Æªº¦a¤è
+			//å°‡iç§»åˆ°ä¸æ˜¯è®Šæ•¸çš„åœ°æ–¹
 			while (i < input.length() && std::isalnum(input.at(i)))
 				i++;
-			string name = input.substr(from, i - from);  //ºI¨úÅÜ¼Æ¦WºÙ
+			string name = input.substr(from, i - from);  //æˆªå–è®Šæ•¸åç¨±
 			i--;
 
-			//TODO:´M§äÅÜ¼Æ¬O§_¦s¦b
+			//TODO:å°‹æ‰¾è®Šæ•¸æ˜¯å¦å­˜åœ¨
 
 			part_input.push_back(name);
 			now_code = 64;
 			next_code = 262;
 			continue;
 		}
-		//¤p¼ÆÂI
+		//å°æ•¸é»
 		if ((next_code & 128) >= 1 && input.at(i) == '.')
 		{
 			now_code = 128;
@@ -139,12 +139,12 @@ int Parser::parseInput(string input, Storage& storage)
 			part_input.push_back(".");
 			continue;
 		}
-		//¥k¬A¸¹
+		//å³æ‹¬è™Ÿ
 		if ((next_code & 256) >= 1 && input.at(i) == ')')
 		{
 			par_count--;
 
-			if (par_count < 0) return -1;  //§PÂ_¬O§_¦h¬A
+			if (par_count < 0) return -1;  //åˆ¤æ–·æ˜¯å¦å¤šæ‹¬
 
 			now_code = 256;
 			next_code = 262;
