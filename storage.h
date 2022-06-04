@@ -1,4 +1,4 @@
-#ifndef STORAGE_H
+ï»¿#ifndef STORAGE_H
 #define STORAGE_H
 #include <map>
 #include <vector>
@@ -14,10 +14,10 @@ class Storage
 {
 public:
     Storage(){}
-    static map<string, vector<string>> variable;  //Àx¦sÅÜ¼Æ<ÅÜ¼Æ¦WºÙ,«á§Ç¦¡>
-    map<int, vector<string>> outputGraphs;  //Àx¦s¿é¥X¨ç¦¡
-    queue<string> infix;  //Àx¦s¤¤§Ç¦¡
-    vector<string> postfix;  //Àx¦s«á§Ç¦¡
+    static map<string, vector<string>> variable;  //å„²å­˜è®Šæ•¸<è®Šæ•¸åç¨±,å¾Œåºå¼>
+    map<int, vector<string>> outputGraphs;  //å„²å­˜è¼¸å‡ºå‡½å¼
+    queue<string> infix;  //å„²å­˜ä¸­åºå¼
+    vector<string> postfix;  //å„²å­˜å¾Œåºå¼
     vector<QColor> color;
 };
 

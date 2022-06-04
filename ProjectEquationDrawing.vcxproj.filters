@@ -37,6 +37,12 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="graphicsscene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="graphicsview.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -57,6 +63,12 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <QtMoc Include="graphicsscene.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <ClInclude Include="graphicsview.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <QtMoc Include="mainwindow.h">
       <Filter>Header Files</Filter>
     </QtMoc>
@@ -74,6 +86,8 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    
+    
     
     
     <CustomBuild Include="debug\moc_predefs.h.cbt">

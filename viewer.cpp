@@ -1,5 +1,9 @@
 ﻿#include "viewer.h"
 #include "mainwindow.h"
+#include <iostream>
+#include <QPainter>
+using std::cout;
+using std::endl;
 
 Viewer::Viewer()
 {
@@ -9,15 +13,13 @@ Viewer::Viewer()
 
 void Viewer::changeText(string str)
 {
-	window.ui->textBrowser->clear();
-	window.ui->textBrowser->setText(QString::fromStdString(str));
-	window.ui->textBrowser->setFont(QFont("Consolas", 20));
+	system("cls");
+	cout << str + " ";
 }
 
 void Viewer::addText(string str)
 {
-	QString nowStr = window.ui->textBrowser->toPlainText();
-	window.ui->textBrowser->setText(nowStr + " " + QString::fromStdString(str));
+	cout << str + " ";
 }
 
 void Viewer::addItem(QColor color)
@@ -30,7 +32,7 @@ void Viewer::addItem(QColor color)
 	QListWidgetItem* item = new QListWidgetItem("");
 	item->setIcon(pixmap);
 	item->setFont(QFont("Microsoft JhengHei UI", 20));
-	window.ui->listWidget->addItem(item);
+    window.ui->listWidget->addItem(item);
 }
 
 void Viewer::editItem(QListWidgetItem* item, QColor color)
