@@ -4,6 +4,8 @@
 #include "storage.h"
 #include "parser.h"
 #include "viewer.h"
+#include <queue>
+using std::queue;
 using std::string;
 
 class Manager
@@ -13,11 +15,12 @@ class Manager
 	Viewer* viewer;
 	vector<QColor> color;
 	int result = 0;
+	void clearQueue(queue<string>& q);
 public:
 	Manager();
 	~Manager();
 	void start();
-	void parseInput(string input);
+	void input(string input);
 	void addNewItem();
 	void editItem(QListWidgetItem* item, int nowRow);
 	void removeItem(int nowRow);

@@ -22,7 +22,7 @@ public:
     Ui::MainWindow* ui;
 private slots:
     void on_addButton_clicked();
-    void list_commitData(QWidget* pLineEdit);
+    void list_commitData();
     void on_listWidget_itemDoubleClicked(QListWidgetItem *item);
 
 private:

@@ -1,4 +1,4 @@
-#include "manager.h"
+﻿#include "manager.h"
 #include "viewer.h"
 #include<ctime>
 #include<cstdlib>
@@ -15,22 +15,38 @@ Manager::~Manager()
 	delete viewer;
 }
 
-void Manager::parseInput(string input)
+void Manager::clearQueue(queue<string>& q)
 {
-	Parser::part_input.clear();
+	queue<string> empty;
+	swap(empty, q);
+}
+
+void Manager::input(string input)
+{
+	clearQueue(storage.infix);
+	storage.postfix.clear();
+
 	result = parser.parseInput(input, storage);
 	if (result != -1)
 	{
-		viewer->changeText(Parser::part_input.at(0));
-		for (int i = 1; i < Parser::part_input.size(); i++)
+		queue<string> display(storage.infix);
+		viewer->changeText(display.front());
+		display.pop();
+		while(display.size() > 0)
 		{
-			viewer->addText(Parser::part_input.at(i));
+			viewer->addText(display.front());
+			display.pop();
 		}
+
+		parser.toPostfix(storage.infix, storage.postfix);
+		system("cls");
+		for (auto it = storage.postfix.begin(); it != storage.postfix.end(); it++)
+			std::cout << *it << " ";
 	}
 	else
 	{
 		viewer->changeText("ERROR");
-		Parser::part_input.clear();
+		clearQueue(storage.infix);
 	}
 }
 
@@ -50,7 +66,8 @@ void Manager::addNewItem()
 	int g = rand() % 256;
 	int b = rand() % 256;
 
-	while (g * 3 + r * 2 + b > 894)
+	//限制顏色深淺(綠色*3+紅色*2+藍色*1)
+	while (g * 3 + r * 2 + b > 1086 || g * 3 + r * 2 + b < 192)
 	{
 		r = rand() % 256;
 		g = rand() % 256;

@@ -1,5 +1,29 @@
 ﻿#include "parser.h"
-vector<string> Parser::part_input;
+#include <stack>
+using std::stack;
+
+bool Parser::isNumber(string str)
+{
+	if (str == "sin" || str == "cos")
+		return false;
+	if (isalpha(str.at(0)))  //如果是變數
+		return true;
+	bool dot = false;
+	for (int i = 0; i < str.length(); i++)
+	{
+		if (!isdigit(str.at(i)))  //遇到非數字
+		{
+			if (!dot && str.at(i) == '.')  //若第一次遇到.
+				dot = true;
+			else if (dot)
+				return false;
+			else
+				return false;
+		}
+	}
+	return true;
+}
+
 Parser::Parser()
 {
 
@@ -13,16 +37,22 @@ int Parser::parseInput(string input, Storage& storage)
 	int eq_pos;  //等號的位置
 
 	//找等號
-	for (eq_pos = 0; eq_pos < input.size() - 1; eq_pos++)
+	for (int i = 1; i < input.size() - 1; i++)
 	{
-		if (input.at(eq_pos) == '=')  //若遇到=
+		if (!isalnum(input.at(i)))
 		{
-			v1 = input.substr(0, eq_pos);
-			break;
+			if (input.at(i) == '=')  //若遇到=
+			{
+				v1 = input.substr(0, i);
+				eq_pos = i;
+				break;
+			}
+			else
+				return -1;
 		}
 	}
 	if (v1.empty() || v1 == "sin" || v1 == "cos") return -1;  //若v1為空字串，回傳-1
-
+	if (storage.variable.find(v1) != storage.variable.end()) return -1;  //變數重複定義
 
 	int par_count = 0;  //計算上下括號數
 	int next_code = 123;  //下一個有效字元的代碼 #初始為(-0axs
@@ -36,15 +66,18 @@ int Parser::parseInput(string input, Storage& storage)
 			par_count++;
 			now_code = 1;
 			next_code = 123;
-			part_input.push_back("(");
+			storage.infix.push("(");
 			continue;
 		}
 		//若是負號或減號
 		if ((next_code & 2) >= 1 && input.at(i) == '-')
 		{
+			if (now_code == 0 || now_code == 1)  //是=或(
+				storage.infix.push("--");  //負號
+			else
+				storage.infix.push("-");  //減號
 			now_code = 2;
 			next_code = 121;
-			part_input.push_back("-");
 			continue;
 		}
 		//加乘除冪
@@ -53,7 +86,7 @@ int Parser::parseInput(string input, Storage& storage)
 		{
 			now_code = 4;
 			next_code = 121;
-			part_input.push_back(string(1, input.at(i)));
+			storage.infix.push(string(1, input.at(i)));
 			continue;
 		}
 		//數字
@@ -80,7 +113,7 @@ int Parser::parseInput(string input, Storage& storage)
 			string str = input.substr(from, i - from);  //截取
 			i--;
 
-			part_input.push_back(str);
+			storage.infix.push(str);
 			continue;
 		}
 		//英文(sin/cos=16, x=32, 其它=64)
@@ -91,7 +124,7 @@ int Parser::parseInput(string input, Storage& storage)
 			{
 				if ((next_code & 16) >= 1 && i + 3 < input.length() && input.at(i + 3) == '(')  //若sin/cos的下個字為(
 				{
-					part_input.push_back(input.substr(i, 3));
+					storage.infix.push(input.substr(i, 3));
 					i += 2;
 					now_code = 16;
 					next_code = 1;
@@ -110,7 +143,7 @@ int Parser::parseInput(string input, Storage& storage)
 				{
 					now_code = 32;
 					next_code = 262;
-					part_input.push_back("x");
+					storage.infix.push("x");
 					continue;
 				}
 			}
@@ -126,7 +159,7 @@ int Parser::parseInput(string input, Storage& storage)
 
 			//TODO:尋找變數是否存在
 
-			part_input.push_back(name);
+			storage.infix.push(name);
 			now_code = 64;
 			next_code = 262;
 			continue;
@@ -136,7 +169,7 @@ int Parser::parseInput(string input, Storage& storage)
 		{
 			now_code = 128;
 			next_code = 8;
-			part_input.push_back(".");
+			storage.infix.push(".");
 			continue;
 		}
 		//右括號
@@ -148,7 +181,7 @@ int Parser::parseInput(string input, Storage& storage)
 
 			now_code = 256;
 			next_code = 262;
-			part_input.push_back(")");
+			storage.infix.push(")");
 			continue;
 		}
 
@@ -165,4 +198,73 @@ int Parser::parseInput(string input, Storage& storage)
 
 
 	return 0;
+}
+
+int Parser::getWeight(string symbol)
+{
+	if (symbol == "sin" || symbol == "cos")
+		return 4;
+	if (symbol == "^")
+		return 3;
+	if (symbol == "*" || symbol == "/")
+		return 2;
+	if (symbol == "+" || symbol.at(0) == '-')
+		return 1;
+	if (symbol == "(")
+		return 0;
+	return -1;
+}
+
+void Parser::toPostfix(queue<string> infix, vector<string>& postfix)
+{
+	stack<string> symbolStack;  //符號的堆疊
+
+	//將infix的每一項都做一次，做完就拿掉
+	while (!infix.empty())
+	{
+		if (isNumber(infix.front()))
+			postfix.push_back(infix.front());
+		else if (symbolStack.empty())
+			symbolStack.push(infix.front());
+		else if (infix.front() == "(")
+		{
+			symbolStack.push("(");
+		}
+		else if (infix.front() == ")")
+		{
+			while (symbolStack.top() != "(")
+			{
+				postfix.push_back(symbolStack.top());
+				symbolStack.pop();
+			}
+			symbolStack.pop();  //清掉(
+		}
+		else if (getWeight(infix.front()) >= 3)
+		{
+			int weight = getWeight(infix.front());
+			while (!symbolStack.empty() && weight < getWeight(symbolStack.top()))
+			{
+				postfix.push_back(symbolStack.top());
+				symbolStack.pop();
+			}
+			symbolStack.push(infix.front());
+		}
+		else if (getWeight(infix.front()) >= 1)
+		{
+			int weight = getWeight(infix.front());
+			while (!symbolStack.empty() && weight <= getWeight(symbolStack.top()))
+			{
+				postfix.push_back(symbolStack.top());
+				symbolStack.pop();
+			}
+			symbolStack.push(infix.front());
+		}
+		infix.pop();
+	}
+	while (!symbolStack.empty())
+	{
+		postfix.push_back(symbolStack.top());
+		symbolStack.pop();
+	}
+
 }
