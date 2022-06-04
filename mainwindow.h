@@ -25,6 +25,8 @@ private slots:
     void list_commitData();
     void on_listWidget_itemDoubleClicked(QListWidgetItem *item);
 
+    void on_pushButton_clicked();
+
 private:
 };
 #endif // MAINWINDOW_H

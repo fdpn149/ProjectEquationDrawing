@@ -1,8 +1,10 @@
 ﻿#include "parser.h"
 #include <stack>
 using std::stack;
+using std::stod;
+using std::to_string;
 
-bool Parser::isNumber(string str)
+bool Parser::isVarNum(string str)
 {
 	if (str == "sin" || str == "cos")
 		return false;
@@ -24,17 +26,26 @@ bool Parser::isNumber(string str)
 	return true;
 }
 
+bool Parser::isOperator(string str)
+{
+	if (!isalnum(str.at(0)))  //若不是英數
+		return true;
+	if (str == "sin" || str == "cos")  //若是sin/cos
+		return true;
+
+	return false;
+}
+
 Parser::Parser()
 {
 
 }
 
-int Parser::parseInput(string input, Storage& storage)
+string Parser::getVarName(string input)
 {
-	if (!std::isalpha(input.at(0))) return -1;  //若輸入的第1字不是英文，回傳-1
+	if (input.empty() || !std::isalpha(input.at(0))) return "";  //若輸入的第1字不是英文
 
 	string v1 = "";  //開頭的變數名稱
-	int eq_pos;  //等號的位置
 
 	//找等號
 	for (int i = 1; i < input.size() - 1; i++)
@@ -44,15 +55,23 @@ int Parser::parseInput(string input, Storage& storage)
 			if (input.at(i) == '=')  //若遇到=
 			{
 				v1 = input.substr(0, i);
-				eq_pos = i;
 				break;
 			}
 			else
-				return -1;
+				return "";
 		}
 	}
-	if (v1.empty() || v1 == "sin" || v1 == "cos") return -1;  //若v1為空字串，回傳-1
-	if (storage.variable.find(v1) != storage.variable.end()) return -1;  //變數重複定義
+	if (v1.empty() || v1 == "sin" || v1 == "cos") return "";  //若v1為空字串或sin/cos
+
+	return v1;
+}
+
+string Parser::parseInput(string input, Storage& storage)
+{
+	string v1 = getVarName(input);  //將v1設為等號前的變數名稱
+	int eq_pos = input.find("=");  //等號的位置
+
+	if (Storage::variable.find(v1) != Storage::variable.end()) return "";  //變數重複定義
 
 	int par_count = 0;  //計算上下括號數
 	int next_code = 123;  //下一個有效字元的代碼 #初始為(-0axs
@@ -101,11 +120,11 @@ int Parser::parseInput(string input, Storage& storage)
 				if (!flag && input.at(i) == '.')
 					flag = true;
 				else if (flag && input.at(i) == '.')
-					return -1;
+					return "";
 				i++;
 			}
-			if (i-1 >= 0 && input.at(i-1) == '.')
-				return -1;
+			if (i - 1 >= 0 && input.at(i - 1) == '.')
+				return "";
 
 			now_code = 8;
 			next_code = 398;
@@ -116,7 +135,7 @@ int Parser::parseInput(string input, Storage& storage)
 			storage.infix.push(str);
 			continue;
 		}
-		//英文(sin/cos=16, x=32, 其它=64)
+		//英文(sin/cos=16, 其它=64)
 		if ((next_code & 112) >= 1 && std::isalpha(input.at(i)))
 		{
 			//sin/cos判斷
@@ -132,32 +151,21 @@ int Parser::parseInput(string input, Storage& storage)
 				}
 				else if (i + 3 < input.length() && !std::isalpha(input.at(i + 3)) && !std::isdigit(input.at(i + 3)))  //若下個字不為英文或數字(不是變數)
 				{
-					return -1;
+					return "";
 				}
 			}
-			//x判斷
-			else if (input.at(i) == 'x')
-			{
-				//若為單純的x
-				if ((next_code & 32) >= 1 && (i + 1 >= input.length() || !std::isalnum(input.at(i + 1))))
-				{
-					now_code = 32;
-					next_code = 262;
-					storage.infix.push("x");
-					continue;
-				}
-			}
+			//變數判斷
 
-			//其它變數判斷//
 			int from = i;
-
 			//將i移到不是變數的地方
 			while (i < input.length() && std::isalnum(input.at(i)))
 				i++;
 			string name = input.substr(from, i - from);  //截取變數名稱
 			i--;
 
-			//TODO:尋找變數是否存在
+			//若變數與等號前的變數相同 或 找不到變數
+			if (name == v1 || (name != "x" && storage.variable.find(name) == storage.variable.end()))
+				return "";
 
 			storage.infix.push(name);
 			now_code = 64;
@@ -177,7 +185,7 @@ int Parser::parseInput(string input, Storage& storage)
 		{
 			par_count--;
 
-			if (par_count < 0) return -1;  //判斷是否多括
+			if (par_count < 0) return "";  //判斷是否多括
 
 			now_code = 256;
 			next_code = 262;
@@ -185,19 +193,19 @@ int Parser::parseInput(string input, Storage& storage)
 			continue;
 		}
 
-		return -1;
+		return "";
 	}
 
 	if (par_count > 0)
-		return -1;
+		return "";
 
 
 
 	if ((now_code & 488) == 0)
-		return -1;
+		return "";
 
 
-	return 0;
+	return v1;
 }
 
 int Parser::getWeight(string symbol)
@@ -222,7 +230,7 @@ void Parser::toPostfix(queue<string> infix, vector<string>& postfix)
 	//將infix的每一項都做一次，做完就拿掉
 	while (!infix.empty())
 	{
-		if (isNumber(infix.front()))
+		if (isVarNum(infix.front()))
 			postfix.push_back(infix.front());
 		else if (symbolStack.empty())
 			symbolStack.push(infix.front());
@@ -267,4 +275,65 @@ void Parser::toPostfix(queue<string> infix, vector<string>& postfix)
 		symbolStack.pop();
 	}
 
+}
+
+double Parser::calculate(double x, vector<string> postfix)
+{
+	for (int i = 0; i < postfix.size(); i++)
+	{
+		string& now = postfix.at(i);
+		if (!isOperator(now))  //若不是運算符號
+		{
+			if (now == "x")
+				now = to_string(x);
+			else if (!isdigit(now.at(0)))  //判斷是否是變數
+			{
+				if (Storage::variable.find(now) != Storage::variable.end())
+				{
+					double num = calculate(x, Storage::variable[now]);  //先計算變數的數值
+					now = to_string(num);  //將該項取代成數值
+				}
+				else
+					throw calculate_error("cannot find variable");
+			}
+		}
+		else  //是運算符號
+		{
+			double pre1 = 0, pre2 = 0;  //前兩項的數值
+			if (i - 1 >= 0) pre1 = stod(postfix.at(i - 1));
+			if (i - 2 >= 0) pre2 = stod(postfix.at(i - 2));
+
+			if (now.size() > 1 && i - 1 >= 0)  //sin/cos/負號
+			{
+				if (now == "sin")
+					now = to_string(std::sin(pre1));
+				else if (now == "cos")
+					now = to_string(std::cos(pre1));
+				else
+					now = to_string(-pre1);
+				i--;
+				postfix.erase(postfix.begin() + i);
+			}
+			else if (i - 2 >= 0)
+			{
+				if (now == "+")
+					now = to_string(pre2 + pre1);
+				else if (now == "-")
+					now = to_string(pre2 - pre1);
+				else if (now == "*")
+					now = to_string(pre2 * pre1);
+				else if (now == "/")
+					now = to_string(pre2 / pre1);
+				else if (now == "^")
+					now = to_string(std::pow(pre2, pre1));
+
+				if (!isdigit(now.at(now.length()-1)))  //若最後一字不為數字(代表計算出問題)
+					throw calculate_error(now);
+
+				i -= 2;
+				postfix.erase(postfix.begin() + i, postfix.begin() + i + 2);
+			}
+		}
+	}
+	return stod(postfix.at(0));
 }

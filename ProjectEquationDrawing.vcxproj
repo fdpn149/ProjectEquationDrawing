@@ -164,7 +164,7 @@
       <IgnoreImportLibrary>true</IgnoreImportLibrary>
       <OutputFile>$(OutDir)\ProjectEquationDrawing.exe</OutputFile>
       <RandomizedBaseAddress>true</RandomizedBaseAddress>
-      <SubSystem>NotSet</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <SuppressStartupBanner>true</SuppressStartupBanner>
     </Link>
     <Midl>

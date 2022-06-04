@@ -31,6 +31,7 @@ public:
     QTextBrowser *textBrowser;
     QListWidget *listWidget;
     QPushButton *addButton;
+    QPushButton *pushButton;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -59,6 +60,9 @@ public:
         addButton = new QPushButton(centralwidget);
         addButton->setObjectName(QString::fromUtf8("addButton"));
         addButton->setGeometry(QRect(800, 510, 93, 29));
+        pushButton = new QPushButton(centralwidget);
+        pushButton->setObjectName(QString::fromUtf8("pushButton"));
+        pushButton->setGeometry(QRect(900, 510, 75, 24));
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName(QString::fromUtf8("menubar"));
@@ -83,6 +87,7 @@ public:
 "</style></head><body style=\" font-family:'Microsoft JhengHei UI'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>", nullptr));
         addButton->setText(QCoreApplication::translate("MainWindow", "Add", nullptr));
+        pushButton->setText(QCoreApplication::translate("MainWindow", "PushButton", nullptr));
     } // retranslateUi
 
 };

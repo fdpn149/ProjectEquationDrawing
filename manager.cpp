@@ -21,32 +21,52 @@ void Manager::clearQueue(queue<string>& q)
 	swap(empty, q);
 }
 
-void Manager::input(string input)
+void Manager::input(string input, QListWidgetItem* item, int nowRow)
 {
 	clearQueue(storage.infix);
 	storage.postfix.clear();
+	string name;
+	name = parser.parseInput(input, storage);
 
-	result = parser.parseInput(input, storage);
-	if (result != -1)
+	if (name != "")
 	{
+		viewer->changeItemIcon(item, 0, storage.color.at(nowRow));
 		queue<string> display(storage.infix);
-		viewer->changeText(display.front());
-		display.pop();
+		viewer->changeText(name + " =");
+
 		while(display.size() > 0)
 		{
 			viewer->addText(display.front());
 			display.pop();
 		}
 
+		viewer->addText("\n");
 		parser.toPostfix(storage.infix, storage.postfix);
-		system("cls");
 		for (auto it = storage.postfix.begin(); it != storage.postfix.end(); it++)
-			std::cout << *it << " ";
+			viewer->addText(*it);
+
+		if (name == "y")
+			storage.outputGraphs[nowRow] = storage.postfix;
+		else
+			storage.variable[name] = storage.postfix;
 	}
 	else
 	{
+		viewer->changeItemIcon(item, -1, storage.color.at(nowRow));
 		viewer->changeText("ERROR");
 		clearQueue(storage.infix);
+	}
+}
+
+void Manager::calculate(double x, string name)
+{
+	viewer->addText("\n");
+	try {
+		string result = std::to_string(parser.calculate(x, storage.variable[name]));
+		viewer->addText(result);
+	}
+	catch (std::exception& e) {
+		viewer->addText(e.what());
 	}
 }
 
@@ -55,10 +75,6 @@ void Manager::start()
 	viewer = new Viewer();
 }
 
-void Manager::changeIcon(QListWidgetItem* item, int nowRow)
-{
-	viewer->changeItemIcon(item, result, color.at(nowRow));
-}
 
 void Manager::addNewItem()
 {
@@ -75,17 +91,27 @@ void Manager::addNewItem()
 	}
 	QColor col = QColor(r, g, b);
 	viewer->addItem(col);
-	color.push_back(col);
+	storage.color.push_back(col);
 }
 
 void Manager::editItem(QListWidgetItem* item, int nowRow)
 {
+	string name = parser.getVarName(item->text().toStdString());
+	if (name == "y")
+		storage.outputGraphs.erase(nowRow);
+	else if(name != "")
+		Storage::variable.erase(name);
 	item->setFlags(item->flags() | Qt::ItemIsEditable);
-	viewer->editItem(item, color.at(nowRow));
+	viewer->editItem(item, storage.color.at(nowRow));
 }
 
-void Manager::removeItem(int nowRow)
+void Manager::removeItem(QListWidgetItem* item, int nowRow)
 {
-	color.erase(color.begin() + nowRow);
+	storage.color.erase(storage.color.begin() + nowRow);
+	string name = parser.getVarName(item->text().toStdString());
+	if(name == "y")
+		storage.outputGraphs.erase(nowRow);
+	else if (name != "")
+		Storage::variable.erase(name);
 }
 

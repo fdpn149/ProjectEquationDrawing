@@ -58,18 +58,23 @@ void MainWindow::list_commitData()
 
     if (listText.isEmpty())
     {
+        manager.removeItem(ui->listWidget->item(nowRow), nowRow);
         ui->listWidget->takeItem(nowRow);
-        manager.removeItem(nowRow);
     }
     else
     {
-        manager.input(listText.toStdString());
-        manager.changeIcon(ui->listWidget->item(nowRow), nowRow);
+        manager.input(listText.toStdString(), ui->listWidget->item(nowRow), nowRow);
     }
 }
 void MainWindow::on_listWidget_itemDoubleClicked(QListWidgetItem *item)
 {
     int nowRow = ui->listWidget->currentRow();
     manager.editItem(item,nowRow);
+}
+
+
+void MainWindow::on_pushButton_clicked()
+{
+    manager.calculate(5, "c");
 }
 
