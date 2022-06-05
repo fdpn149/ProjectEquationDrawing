@@ -68,47 +68,125 @@ vector<double> GraphicsScene::create_data(double start, double end, int segment_
 
 void GraphicsScene::moveScene(int x, int y)
 {
-    int xRange = 10;
-    int yRange = 10;
     QGraphicsLineItem* nowItem;
     qreal x1, y1, x2, y2;
 
     //垂直移動
-    for (int i = 0; i < yRange; i++)
+    if (y < 0)  //滑鼠向上拖曳(可視範圍向下增加)
     {
-        nowItem = grid_h.at(i);
-        this->removeItem(nowItem);
-        x1 = nowItem->line().x1();
-        y1 = nowItem->line().y1() + y;
-        x2 = nowItem->line().x2();
-        if (y1 < 0)
+        int yRange = 10;
+        for (int i = 0; i < yRange; i++)
         {
-            y1 = VIEW_HEIGHT + y1;
-            grid_h.pop_front();
-            i--;
-            yRange--;
-            yAxisPos--;
-            nowItem->setLine(x1, y1, x2, y1);
-            this->addItem(nowItem);
-            grid_h.push_back(nowItem);
-        }
-        else
-        {
-            nowItem->setLine(x1, y1, x2, y1);
-            this->addItem(nowItem);
+            nowItem = grid_h.at(i);
+            this->removeItem(nowItem);
+            x1 = nowItem->line().x1();
+            y1 = nowItem->line().y1() + y;
+            x2 = nowItem->line().x2();
+            if (y1 < 0)
+            {
+                y1 = VIEW_HEIGHT + y1;
+                grid_h.pop_front();
+                i--;
+                yRange--;
+                yAxisPos--;
+                nowItem->setLine(x1, y1, x2, y1);
+                this->addItem(nowItem);
+                grid_h.push_back(nowItem);
+            }
+            else
+            {
+                nowItem->setLine(x1, y1, x2, y1);
+                this->addItem(nowItem);
+            }
         }
     }
-
-
+    else  //滑鼠向下拖曳(可視範圍向上增加)
+    {
+        int yRange = 0;
+        for (int i = 9; i >= yRange; i--)
+        {
+            nowItem = grid_h.at(i);
+            this->removeItem(nowItem);
+            x1 = nowItem->line().x1();
+            y1 = nowItem->line().y1() + y;
+            x2 = nowItem->line().x2();
+            if (y1 > VIEW_HEIGHT)
+            {
+                y1 = y1 - VIEW_HEIGHT;
+                grid_h.pop_back();
+                i++;
+                yRange++;
+                yAxisPos++;
+                nowItem->setLine(x1, y1, x2, y1);
+                this->addItem(nowItem);
+                grid_h.push_front(nowItem);
+            }
+            else
+            {
+                nowItem->setLine(x1, y1, x2, y1);
+                this->addItem(nowItem);
+            }
+        }
+    }
+    
     //水平移動
-    for (int i = 0; i < 10; i++)
+    if (x < 0)  //滑鼠向左拖曳(可視範圍向右增加)
     {
-        QGraphicsLineItem* nowItem = grid_h.at(i);
-        nowItem = grid_v.at(i);
-        this->removeItem(nowItem);
-        nowItem->setLine(nowItem->line().x1()+x, nowItem->line().y1(), nowItem->line().x2()+x, nowItem->line().y2());
-        this->addItem(nowItem);
+        int xRange = 10;
+        for (int i = 0; i < xRange; i++)
+        {
+            nowItem = grid_v.at(i);
+            this->removeItem(nowItem);
+            y1 = nowItem->line().y1();
+            x1 = nowItem->line().x1() + x;
+            y2 = nowItem->line().y2();
+            if (x1 < 0)
+            {
+                x1 = VIEW_WIDTH + x1;
+                grid_v.pop_front();
+                i--;
+                xRange--;
+                xAxisPos--;
+                nowItem->setLine(x1, y1, x1, y2);
+                this->addItem(nowItem);
+                grid_v.push_back(nowItem);
+            }
+            else
+            {
+                nowItem->setLine(x1, y1, x1, y2);
+                this->addItem(nowItem);
+            }
+        }
     }
+    else  //滑鼠向右拖曳(可視範圍向左增加)
+    {
+        int xRange = 0;
+        for (int i = 9; i >= xRange; i--)
+        {
+            nowItem = grid_v.at(i);
+            this->removeItem(nowItem);
+            y1 = nowItem->line().y1();
+            x1 = nowItem->line().x1() + x;
+            y2 = nowItem->line().y2();
+            if (x1 > VIEW_WIDTH)
+            {
+                x1 = x1 - VIEW_WIDTH;
+                grid_v.pop_back();
+                i++;
+                xRange++;
+                xAxisPos++;
+                nowItem->setLine(x1, y1, x1, y2);
+                this->addItem(nowItem);
+                grid_v.push_front(nowItem);
+            }
+            else
+            {
+                nowItem->setLine(x1, y1, x1, y2);
+                this->addItem(nowItem);
+            }
+        }
+    }
+    
 }
 
 void GraphicsScene::draw()

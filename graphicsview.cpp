@@ -38,7 +38,8 @@ void GraphicsView::mouseMoveEvent(QMouseEvent* event)
         const int deltaY = event->position().y() - lastPosition.y();
 
         system("cls");
-        std::cout << deltaX << std::endl << deltaY;
+        std::cout << deltaX << std::endl << deltaY << std::endl;
+        std::cout << deltaX-lastDeltaX << std::endl << deltaY-lastDeltaY << std::endl;
 
         scene->moveScene(deltaX-lastDeltaX, deltaY-lastDeltaY);
 
