@@ -62,8 +62,11 @@ void Manager::calculate(double x, string name)
 {
 	viewer->addText("\n");
 	try {
-		string result = std::to_string(parser.calculate(x, storage.variable[name]));
-		viewer->addText(result);
+		if (storage.variable.find(name) != storage.variable.end())
+		{
+			string result = std::to_string(parser.calculate(x, storage.variable[name]));
+			viewer->addText(result);
+		}
 	}
 	catch (std::exception& e) {
 		viewer->addText(e.what());
