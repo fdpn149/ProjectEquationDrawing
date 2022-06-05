@@ -15,6 +15,11 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+QListWidgetItem* MainWindow::getListItem(int index)
+{
+    return ui->listWidget->item(index);
+}
+
 
 void MainWindow::on_addButton_clicked()
 {
@@ -45,6 +50,7 @@ void MainWindow::on_listWidget_itemDoubleClicked(QListWidgetItem *item)
 
 void MainWindow::on_pushButton_clicked()
 {
-    manager.calculate(5, "c");
+    system("cls");
+    manager.calculate(5, "y");
 }
 

@@ -15,6 +15,7 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     Ui::MainWindow* ui;
+    QListWidgetItem* getListItem(int index);
 private slots:
     void on_addButton_clicked();
     void list_commitData();

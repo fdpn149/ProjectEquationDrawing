@@ -1,3 +1,3 @@
 #include "storage.h"
 
-map<string, vector<string>> Storage::variable;
+vector<pair<string, vector<string>>> Storage::variable;
