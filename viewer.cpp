@@ -61,3 +61,19 @@ void Viewer::changeItemIcon(QListWidgetItem* item, int type, QColor color)
 
 	item->setIcon(pixmap);
 }
+
+void Viewer::changeItemIcon(int index, int type, QColor color)
+{
+	QPixmap pixmap(40, 40);
+	pixmap.fill(color);
+	QPainter painter(&pixmap);
+	painter.setFont(QFont("Consolas", 25));
+	painter.setPen(QColor("white"));
+
+	if (type == 0)
+		painter.drawText(QPoint(10, 30), " ");
+	else if (type == -1)
+		painter.drawText(QPoint(10, 30), "E");
+
+	window.getListItem(index)->setIcon(pixmap);
+}

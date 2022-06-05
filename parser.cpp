@@ -66,12 +66,13 @@ string Parser::getVarName(string input)
 	return v1;
 }
 
-string Parser::parseInput(string input, Storage& storage)
+string Parser::parseInput(string input, Storage& storage, int nowRow)
 {
 	string v1 = getVarName(input);  //將v1設為等號前的變數名稱
 	int eq_pos = input.find("=");  //等號的位置
 
-	if (Storage::variable.find(v1) != Storage::variable.end()) return "";  //變數重複定義
+	if (v1 != "y" && findVariable(Storage::variable.rbegin() + Storage::variable.size() - nowRow - 1,
+		Storage::variable.rend(), v1) != Storage::variable.rend()) return "";  //變數重複定義
 
 	int par_count = 0;  //計算上下括號數
 	int next_code = 123;  //下一個有效字元的代碼 #初始為(-0axs
@@ -163,8 +164,12 @@ string Parser::parseInput(string input, Storage& storage)
 			string name = input.substr(from, i - from);  //截取變數名稱
 			i--;
 
+			if (name == "y")
+				return "";
+
 			//若變數與等號前的變數相同 或 找不到變數
-			if (name == v1 || (name != "x" && storage.variable.find(name) == storage.variable.end()))
+			if (name == v1 || (name != "x" && findVariable(Storage::variable.rbegin() + Storage::variable.size() - nowRow - 1,
+				Storage::variable.rend(), name) == storage.variable.rend()))
 				return "";
 
 			storage.infix.push(name);
@@ -277,8 +282,11 @@ void Parser::toPostfix(queue<string> infix, vector<string>& postfix)
 
 }
 
-double Parser::calculate(double x, vector<string> postfix)
+double Parser::calculate(double x, vector<pair<string, vector<string>>>::reverse_iterator rbegin,
+	vector<pair<string, vector<string>>>::reverse_iterator rend)
 {
+	vector<string> postfix = rbegin->second;
+
 	for (int i = 0; i < postfix.size(); i++)
 	{
 		string& now = postfix.at(i);
@@ -288,9 +296,10 @@ double Parser::calculate(double x, vector<string> postfix)
 				now = to_string(x);
 			else if (!isdigit(now.at(0)))  //判斷是否是變數
 			{
-				if (Storage::variable.find(now) != Storage::variable.end())
+				auto rit = findVariable(rbegin, Storage::variable.rend(), now);
+				if (rit != Storage::variable.rend())
 				{
-					double num = calculate(x, Storage::variable[now]);  //先計算變數的數值
+					double num = calculate(x, rit, rend);  //先計算變數的數值
 					now = to_string(num);  //將該項取代成數值
 				}
 				else
@@ -327,7 +336,7 @@ double Parser::calculate(double x, vector<string> postfix)
 				else if (now == "^")
 					now = to_string(std::pow(pre2, pre1));
 
-				if (!isdigit(now.at(now.length()-1)))  //若最後一字不為數字(代表計算出問題)
+				if (!isdigit(now.at(now.length() - 1)))  //若最後一字不為數字(代表計算出問題)
 					throw calculate_error(now);
 
 				i -= 2;

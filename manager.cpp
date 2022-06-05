@@ -26,47 +26,72 @@ void Manager::input(string input, QListWidgetItem* item, int nowRow)
 	clearQueue(storage.infix);
 	storage.postfix.clear();
 	string name;
-	name = parser.parseInput(input, storage);
+	name = parser.parseInput(input, storage, nowRow);
+	
 
 	if (name != "")
 	{
 		viewer->changeItemIcon(item, 0, storage.color.at(nowRow));
-		queue<string> display(storage.infix);
-		viewer->changeText(name + " =");
 
-		while(display.size() > 0)
+		/*queue<string> display(storage.infix);
+		viewer->changeText(name + " =");
+		while (display.size() > 0)
 		{
 			viewer->addText(display.front());
 			display.pop();
-		}
+		}*/
 
-		viewer->addText("\n");
 		parser.toPostfix(storage.infix, storage.postfix);
-		for (auto it = storage.postfix.begin(); it != storage.postfix.end(); it++)
-			viewer->addText(*it);
 
-		if (name == "y")
-			storage.outputGraphs[nowRow] = storage.postfix;
-		else
-			storage.variable[name] = storage.postfix;
+		/*viewer->addText("\n");
+		for (auto it = storage.postfix.begin(); it != storage.postfix.end(); it++)
+			viewer->addText(*it);*/
+
+		storage.variable.at(nowRow) = { name, storage.postfix };
+
+		//檢查是否有變數重複定義
+		for (int i = 0; i < Storage::variable.size(); i++)
+		{
+			string now_name = Storage::variable.at(i).first;
+			if (now_name != "y")
+			{
+				int total = std::count_if(Storage::variable.begin(), Storage::variable.end(),
+					[now_name](pair<string, vector<string>> p) {return now_name == p.first; });
+				int k = Storage::variable.size() - 1;
+				for (int j = total; j > 1; j--)
+				{
+					while (Storage::variable.at(k).first != now_name) k--;
+					Storage::variable.at(k).first = "";
+					Storage::variable.at(k).second = vector<string>();
+					viewer->changeItemIcon(k, -1, storage.color.at(k));
+				}
+			}
+		}
 	}
 	else
 	{
 		viewer->changeItemIcon(item, -1, storage.color.at(nowRow));
-		viewer->changeText("ERROR");
+		//viewer->changeText("ERROR");
 		clearQueue(storage.infix);
 	}
 }
 
 void Manager::calculate(double x, string name)
-{
-	viewer->addText("\n");
-	try {
-		string result = std::to_string(parser.calculate(x, storage.variable[name]));
-		viewer->addText(result);
-	}
-	catch (std::exception& e) {
-		viewer->addText(e.what());
+{	
+	for (int i = 0; i < Storage::variable.size(); i++)
+	{
+		auto rit = Storage::variable.rbegin() + i;
+		if (rit->first == name)
+		{
+			try {
+				string result = std::to_string(parser.calculate(x, rit, Storage::variable.rend()));
+				viewer->addText("\n");
+				viewer->addText(result);
+			}
+			catch (std::exception& e) {
+				viewer->addText(e.what());
+			}
+		}
 	}
 }
 
@@ -92,15 +117,13 @@ void Manager::addNewItem()
 	QColor col = QColor(r, g, b);
 	viewer->addItem(col);
 	storage.color.push_back(col);
+	storage.variable.push_back({ "",vector<string>() });
 }
 
 void Manager::editItem(QListWidgetItem* item, int nowRow)
 {
 	string name = parser.getVarName(item->text().toStdString());
-	if (name == "y")
-		storage.outputGraphs.erase(nowRow);
-	else if(name != "")
-		Storage::variable.erase(name);
+	storage.variable.at(nowRow) = { "", vector<string>() };
 	item->setFlags(item->flags() | Qt::ItemIsEditable);
 	viewer->editItem(item, storage.color.at(nowRow));
 }
@@ -109,9 +132,6 @@ void Manager::removeItem(QListWidgetItem* item, int nowRow)
 {
 	storage.color.erase(storage.color.begin() + nowRow);
 	string name = parser.getVarName(item->text().toStdString());
-	if(name == "y")
-		storage.outputGraphs.erase(nowRow);
-	else if (name != "")
-		Storage::variable.erase(name);
+	storage.variable.erase(storage.variable.begin() + nowRow);
 }
 
