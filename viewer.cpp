@@ -77,3 +77,8 @@ void Viewer::changeItemIcon(int index, int type, QColor color)
 
 	window.getListItem(index)->setIcon(pixmap);
 }
+
+void Viewer::showGraph()
+{
+	window.ui->graphicsView->scene->draw();
+}

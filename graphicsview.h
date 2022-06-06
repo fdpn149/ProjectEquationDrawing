@@ -7,7 +7,7 @@
 
 class GraphicsView : public QGraphicsView
 {
-    GraphicsScene* scene;
+    
 
     QPoint lastPosition;
     bool isMoving = false;
@@ -17,6 +17,7 @@ class GraphicsView : public QGraphicsView
 public:
     GraphicsView(QWidget* parent = 0);
     ~GraphicsView();
+    GraphicsScene* scene;
 protected:
     void mousePressEvent(QMouseEvent* event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;

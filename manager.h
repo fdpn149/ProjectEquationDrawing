@@ -21,7 +21,8 @@ public:
 	void addNewItem();
 	void editItem(QListWidgetItem* item, int nowRow);
 	void removeItem(QListWidgetItem* item, int nowRow);
-	void calculate(double x, string name);
+	double calculate(double x, int index);
+	void showGraph();
 };
 
 extern Manager manager;

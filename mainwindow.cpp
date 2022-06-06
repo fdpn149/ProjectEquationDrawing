@@ -40,6 +40,7 @@ void MainWindow::list_commitData()
     {
         manager.input(listText.toStdString(), ui->listWidget->item(nowRow), nowRow);
     }
+    manager.showGraph();
 }
 void MainWindow::on_listWidget_itemDoubleClicked(QListWidgetItem *item)
 {
@@ -50,7 +51,8 @@ void MainWindow::on_listWidget_itemDoubleClicked(QListWidgetItem *item)
 
 void MainWindow::on_pushButton_clicked()
 {
-    system("cls");
-    manager.calculate(5, "y");
+    //system("cls");
+    ////manager.calculate(5, "y");
+    //manager.showGraph();
 }
 

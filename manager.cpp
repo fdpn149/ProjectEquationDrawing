@@ -1,5 +1,6 @@
 ﻿#include "manager.h"
 #include "viewer.h"
+#include "graphicsscene.h"
 #include<ctime>
 #include<cstdlib>
 
@@ -27,7 +28,7 @@ void Manager::input(string input, QListWidgetItem* item, int nowRow)
 	storage.postfix.clear();
 	string name;
 	name = parser.parseInput(input, storage, nowRow);
-	
+
 
 	if (name != "")
 	{
@@ -76,23 +77,23 @@ void Manager::input(string input, QListWidgetItem* item, int nowRow)
 	}
 }
 
-void Manager::calculate(double x, string name)
-{	
-	for (int i = 0; i < Storage::variable.size(); i++)
-	{
-		auto rit = Storage::variable.rbegin() + i;
-		if (rit->first == name)
-		{
-			try {
-				string result = std::to_string(parser.calculate(x, rit, Storage::variable.rend()));
-				viewer->addText("\n");
-				viewer->addText(result);
-			}
-			catch (std::exception& e) {
-				viewer->addText(e.what());
-			}
-		}
+double Manager::calculate(double x, int index)
+{
+	int rindex = Storage::variable.size() - index - 1;
+	try {
+		return parser.calculate(x, Storage::variable.rbegin() + rindex, Storage::variable.rend());
+		//viewer->addText("\n");
+		//viewer->addText(result);
 	}
+	catch (std::exception& e) {
+		viewer->addText(e.what());
+		throw;
+	}
+}
+
+void Manager::showGraph()
+{
+	viewer->showGraph();
 }
 
 void Manager::start()
