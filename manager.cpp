@@ -134,5 +134,6 @@ void Manager::removeItem(QListWidgetItem* item, int nowRow)
 	storage.color.erase(storage.color.begin() + nowRow);
 	string name = parser.getVarName(item->text().toStdString());
 	storage.variable.erase(storage.variable.begin() + nowRow);
+	viewer->removeGraph(nowRow);
 }
 

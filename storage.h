@@ -19,7 +19,7 @@ public:
 	static map<int, QGraphicsPathItem*> outputGraph;
 	queue<string> infix;  //儲存中序式
 	vector<string> postfix;  //儲存後序式
-	vector<QColor> color;
+	static vector<QColor> color;
 };
 
 #endif // STORAGE_H

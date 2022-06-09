@@ -32,6 +32,7 @@ public:
     deque<QGraphicsLineItem*> grid_h;  //水平格線
     deque<QGraphicsLineItem*> grid_v;  //垂直格線
     void draw();
+    void removeGraph(int index);
 private:
     const int VIEW_WIDTH;  //介面寬度
     const int VIEW_HEIGHT;  //介面高度

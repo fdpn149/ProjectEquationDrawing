@@ -255,10 +255,23 @@ void GraphicsScene::draw()
 			}
 			QGraphicsPathItem* pathItem = new QGraphicsPathItem();
 			pathItem->setPath(path);
+			QPen pen;
+			pen.setColor(Storage::color.at(i));
+			pen.setWidth(2);
+			pathItem->setPen(pen);
 			if (Storage::outputGraph.find(i) != Storage::outputGraph.end())
 				this->removeItem(Storage::outputGraph[i]);
 			this->addItem(pathItem);
 			Storage::outputGraph[i] = pathItem;
 		}
+	}
+}
+
+void GraphicsScene::removeGraph(int index)
+{
+	if (Storage::outputGraph.find(index) != Storage::outputGraph.end())
+	{
+		this->removeItem(Storage::outputGraph[index]);
+		Storage::outputGraph.erase(index);
 	}
 }

@@ -16,6 +16,7 @@ public:
 	void changeItemIcon(QListWidgetItem* item, int type, QColor color);
 	void changeItemIcon(int index, int type, QColor color);
 	void showGraph();
+	void removeGraph(int index);
 };
 
 #endif // VIEWER_H

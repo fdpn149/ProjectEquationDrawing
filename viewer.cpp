@@ -82,3 +82,8 @@ void Viewer::showGraph()
 {
 	window.ui->graphicsView->scene->draw();
 }
+
+void Viewer::removeGraph(int index)
+{
+	window.ui->graphicsView->scene->removeGraph(index);
+}
