@@ -6,16 +6,20 @@ GraphicsScene::GraphicsScene(QObject* parent, int width, int height)
 {
 	grid_h.resize(10);  //設定初始大小為10
 	grid_v.resize(10);  //設定初始大小為10
+	text_x.resize(10);  //設定初始大小為10
+	text_y.resize(10);  //設定初始大小為10
 
 	QPen pen;
 	pen.setWidth(3);
 
+	//䢖立x軸
 	QGraphicsLineItem* xAxis = new QGraphicsLineItem();
 	xAxis->setPen(pen);
 	xAxis->setLine(0, CENTER_Y, width, CENTER_Y);
 	this->addItem(xAxis);
 	grid_h.at(5) = xAxis;
 
+	//建立y軸
 	QGraphicsLineItem* yAxis = new QGraphicsLineItem();
 	yAxis->setPen(pen);
 	yAxis->setLine(CENTER_X, 0, CENTER_X, height);
@@ -25,7 +29,22 @@ GraphicsScene::GraphicsScene(QObject* parent, int width, int height)
 	pen.setWidth(1);
 	for (int i = 0; i < 10; i++)
 	{
+		//建立y軸文字
+		QGraphicsTextItem* ytext = new QGraphicsTextItem();
+		ytext->setPlainText(QString::number(5 - i));
+		ytext->setPos(CENTER_X, i * height / 10);
+		this->addItem(ytext);
+		text_y.at(i) = ytext;
+
+		//建立x軸文字
+		QGraphicsTextItem* xtext = new QGraphicsTextItem();
+		xtext->setPlainText(QString::number(i - 5));
+		xtext->setPos(i * width / 10, CENTER_Y);
+		this->addItem(xtext);
+		text_x.at(i) = xtext;
+
 		if (i == 5) continue;  //跳過坐標軸的線
+
 		QGraphicsLineItem* hGrid = new QGraphicsLineItem();
 		hGrid->setPen(pen);
 		hGrid->setLine(0, i * height / 10, width, i * height / 10);
@@ -44,7 +63,14 @@ GraphicsScene::GraphicsScene(QObject* parent, int width, int height)
 
 GraphicsScene::~GraphicsScene()
 {
-
+	for (QGraphicsLineItem* q : grid_h)
+		delete q;
+	for (QGraphicsLineItem* q : grid_v)
+		delete q;
+	for (QGraphicsTextItem* q : text_x)
+		delete q;
+	for (QGraphicsTextItem* q : text_y)
+		delete q;
 }
 
 vector<double> GraphicsScene::create_data(double start, double end, int segment_count, int index)
@@ -60,7 +86,7 @@ vector<double> GraphicsScene::create_data(double start, double end, int segment_
 		try {
 			data.push_back(manager.calculate(x, index));
 		}
-		catch(std::exception& e){
+		catch (std::exception& e) {
 			string w = e.what();
 			if (w.at(0) == '-')
 				data.push_back(std::numeric_limits<double>::min());
@@ -81,10 +107,15 @@ void GraphicsScene::moveScene(int x, int y)
 	QPen gridPen;
 	axisPen.setWidth(3);
 	int range;
+
+	//調整xy的顯示範圍
 	x_min -= x * 10.0 / (double)VIEW_WIDTH;
 	x_max -= x * 10.0 / (double)VIEW_WIDTH;
 	y_min += y * 10.0 / (double)VIEW_HEIGHT;
 	y_max += y * 10.0 / (double)VIEW_HEIGHT;
+
+	//移動格線//
+
 	//垂直移動
 	if (y < 0)  //滑鼠向上拖曳(可視範圍向下增加)
 	{
@@ -220,14 +251,136 @@ void GraphicsScene::moveScene(int x, int y)
 			}
 		}
 	}
+
+
+	QGraphicsTextItem* nowTextItem;
+	//垂直移動
+	if (y < 0)  //滑鼠向上拖曳(可視範圍向下增加)
+	{
+		range = 10;
+		for (int i = 0; i < range; i++)
+		{
+			nowTextItem = text_y.at(i);
+			this->removeItem(nowTextItem);
+			x1 = nowTextItem->pos().x() + x;
+			y1 = nowTextItem->pos().y() + y;
+
+			if (y1 < 0)
+			{
+				y1 = VIEW_HEIGHT + y1;
+				text_y.pop_front();
+				i--;
+				range--;
+
+				nowTextItem->setPos(x1, y1);
+				nowTextItem->setPlainText(QString::number(text_y.at(text_y.size() - 1)->toPlainText().toDouble() - 1));
+				this->addItem(nowTextItem);
+				text_y.push_back(nowTextItem);
+			}
+			else
+			{
+				nowTextItem->setPos(x1, y1);
+				this->addItem(nowTextItem);
+			}
+		}
+	}
+	else  //滑鼠向下拖曳(可視範圍向上增加)
+	{
+		range = 0;
+		for (int i = 9; i >= range; i--)
+		{
+			nowTextItem = text_y.at(i);
+			this->removeItem(nowTextItem);
+			x1 = nowTextItem->pos().x() + x;
+			y1 = nowTextItem->pos().y() + y;
+			if (y1 > VIEW_HEIGHT)
+			{
+				y1 = y1 - VIEW_HEIGHT;
+				text_y.pop_back();
+				i++;
+				range++;
+
+				nowTextItem->setPos(x1, y1);
+				nowTextItem->setPlainText(QString::number(text_y.at(0)->toPlainText().toDouble() + 1));
+				this->addItem(nowTextItem);
+				text_y.push_front(nowTextItem);
+			}
+			else
+			{
+				nowTextItem->setPos(x1, y1);
+				//nowTextItem->setLine(x1, y1, x2, y1);
+				this->addItem(nowTextItem);
+			}
+		}
+	}
+
+	//水平移動
+	if (x < 0)  //滑鼠向左拖曳(可視範圍向右增加)
+	{
+		range = 10;
+		for (int i = 0; i < range; i++)
+		{
+			nowTextItem = text_x.at(i);
+			this->removeItem(nowTextItem);
+			x1 = nowTextItem->pos().x() + x;
+			y1 = nowTextItem->pos().y() + y;
+			if (x1 < 0)
+			{
+				x1 = VIEW_WIDTH + x1;
+				text_x.pop_front();
+				i--;
+				range--;
+
+				nowTextItem->setPos(x1, y1);
+				nowTextItem->setPlainText(QString::number(text_x.at(text_x.size() - 1)->toPlainText().toDouble() + 1));
+				this->addItem(nowTextItem);
+				text_x.push_back(nowTextItem);
+			}
+			else
+			{
+				nowTextItem->setPos(x1, y1);
+				this->addItem(nowTextItem);
+			}
+		}
+	}
+	else  //滑鼠向右拖曳(可視範圍向左增加)
+	{
+		range = 0;
+		for (int i = 9; i >= range; i--)
+		{
+			nowTextItem = text_x.at(i);
+			this->removeItem(nowTextItem);
+			x1 = nowTextItem->pos().x() + x;
+			y1 = nowTextItem->pos().y() + y;
+			if (x1 > VIEW_WIDTH)
+			{
+				x1 = x1 - VIEW_WIDTH;
+				text_x.pop_back();
+				i++;
+				range++;
+
+				nowTextItem->setPos(x1, y1);
+				nowTextItem->setPlainText(QString::number(text_x.at(0)->toPlainText().toDouble() - 1));
+				this->addItem(nowTextItem);
+				text_x.push_front(nowTextItem);
+			}
+			else
+			{
+				nowTextItem->setPos(x1, y1);
+				this->addItem(nowTextItem);
+			}
+		}
+	}
+
+
 	manager.showGraph();
 }
 
 void GraphicsScene::draw()
 {
-	for (int i = 0; i < Storage::variable.size(); i++)
+	for (int i = 0; i < Storage::graphs.size(); i++)
 	{
-		if (Storage::variable.at(i).first == "y")
+		if (Storage::graphs.at(i)->name == "y")
 		{
 			vector<double> data = create_data(x_min, x_max, 100.0, i);
 
@@ -253,25 +406,27 @@ void GraphicsScene::draw()
 				else
 					path.lineTo(start_x, data[i] * delta_y + CENTER_Y + (y_max - 5) * VIEW_WIDTH / 10.0);
 			}
-			QGraphicsPathItem* pathItem = new QGraphicsPathItem();
+			QGraphicsPathItem* pathItem;
+			if (Storage::graphs.at(i)->graph != nullptr)
+			{
+				pathItem = Storage::graphs.at(i)->graph;
+				this->removeItem(Storage::graphs.at(i)->graph);
+			}
+			else
+				pathItem = new QGraphicsPathItem();
 			pathItem->setPath(path);
 			QPen pen;
-			pen.setColor(Storage::color.at(i));
+			pen.setColor(Storage::graphs.at(i)->color);
 			pen.setWidth(2);
 			pathItem->setPen(pen);
-			if (Storage::outputGraph.find(i) != Storage::outputGraph.end())
-				this->removeItem(Storage::outputGraph[i]);
+
+			Storage::graphs.at(i)->graph = pathItem;
 			this->addItem(pathItem);
-			Storage::outputGraph[i] = pathItem;
 		}
 	}
 }
 
 void GraphicsScene::removeGraph(int index)
 {
-	if (Storage::outputGraph.find(index) != Storage::outputGraph.end())
-	{
-		this->removeItem(Storage::outputGraph[index]);
-		Storage::outputGraph.erase(index);
-	}
+	this->removeItem(Storage::graphs.at(index)->graph);
 }

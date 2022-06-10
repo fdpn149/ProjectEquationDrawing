@@ -58,9 +58,9 @@ void GraphicsView::wheelEvent(QWheelEvent* event)
     QPointF view_pos = event->position();
     QPointF scene_pos = this->mapToScene(view_pos.toPoint());
 
-    system("cls");
-    std::cout << "viewPos=  " << view_pos.x() << "  " << view_pos.y() << std::endl;
-    std::cout << "scenePos=  " << scene_pos.x() << "  " << scene_pos.y() << std::endl;
+    //system("cls");
+    //std::cout << "viewPos=  " << view_pos.x() << "  " << view_pos.y() << std::endl;
+    //std::cout << "scenePos=  " << scene_pos.x() << "  " << scene_pos.y() << std::endl;
 
     this->centerOn(scene_pos);
     this->scale(factor, factor);

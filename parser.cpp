@@ -71,8 +71,8 @@ string Parser::parseInput(string input, Storage& storage, int nowRow)
 	string v1 = getVarName(input);  //將v1設為等號前的變數名稱
 	int eq_pos = input.find("=");  //等號的位置
 
-	if (v1 != "y" && findVariable(Storage::variable.rbegin() + Storage::variable.size() - nowRow - 1,
-		Storage::variable.rend(), v1) != Storage::variable.rend()) return "";  //變數重複定義
+	if (v1 != "y" && findVariable(Storage::graphs.rbegin() + Storage::graphs.size() - nowRow - 1,
+		Storage::graphs.rend(), v1) != Storage::graphs.rend()) return "";  //變數重複定義
 
 	int par_count = 0;  //計算上下括號數
 	int next_code = 123;  //下一個有效字元的代碼 #初始為(-0axs
@@ -168,8 +168,8 @@ string Parser::parseInput(string input, Storage& storage, int nowRow)
 				return "";
 
 			//若變數與等號前的變數相同 或 找不到變數
-			if (name == v1 || (name != "x" && findVariable(Storage::variable.rbegin() + Storage::variable.size() - nowRow - 1,
-				Storage::variable.rend(), name) == storage.variable.rend()))
+			if (name == v1 || (name != "x" && findVariable(Storage::graphs.rbegin() + Storage::graphs.size() - nowRow - 1,
+				Storage::graphs.rend(), name) == Storage::graphs.rend()))
 				return "";
 
 			storage.infix.push(name);
@@ -282,10 +282,9 @@ void Parser::toPostfix(queue<string> infix, vector<string>& postfix)
 
 }
 
-double Parser::calculate(double x, vector<pair<string, vector<string>>>::reverse_iterator rbegin,
-	vector<pair<string, vector<string>>>::reverse_iterator rend)
+double Parser::calculate(double x, vector<Graph*>::reverse_iterator rbegin, vector<Graph*>::reverse_iterator rend)
 {
-	vector<string> postfix = rbegin->second;
+	vector<string> postfix = (*rbegin)->postfix;
 
 	for (int i = 0; i < postfix.size(); i++)
 	{
@@ -296,8 +295,8 @@ double Parser::calculate(double x, vector<pair<string, vector<string>>>::reverse
 				now = to_string(x);
 			else if (!isdigit(now.at(0)))  //判斷是否是變數
 			{
-				auto rit = findVariable(rbegin, Storage::variable.rend(), now);
-				if (rit != Storage::variable.rend())
+				auto rit = findVariable(rbegin, Storage::graphs.rend(), now);
+				if (rit != Storage::graphs.rend())
 				{
 					double num = calculate(x, rit, rend);  //先計算變數的數值
 					now = to_string(num);  //將該項取代成數值
