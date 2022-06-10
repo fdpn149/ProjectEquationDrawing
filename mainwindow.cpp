@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+﻿#include "mainwindow.h"
 #include <manager.h>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -28,17 +28,17 @@ void MainWindow::on_addButton_clicked()
 
 void MainWindow::list_commitData()
 {
-    int nowRow = ui->listWidget->currentRow();
-    QString listText = ui->listWidget->item(nowRow)->text();
+    int nowRow = ui->listWidget->currentRow();  //得到現在的列
+    QListWidgetItem* item = ui->listWidget->item(nowRow);  //得到現在的列表物品(ListItem)
 
-    if (listText.isEmpty())
+    if (item->text().isEmpty())
     {
-        manager.removeItem(ui->listWidget->item(nowRow), nowRow);
-        ui->listWidget->takeItem(nowRow);
+        manager.removeItem(item, nowRow);
+        ui->listWidget->takeItem(nowRow);  //從列表中移除物品
     }
     else
     {
-        manager.input(listText.toStdString(), ui->listWidget->item(nowRow), nowRow);
+        manager.input(item->text().toStdString(), item, nowRow);
     }
     manager.showGraph();
 }
@@ -51,8 +51,6 @@ void MainWindow::on_listWidget_itemDoubleClicked(QListWidgetItem *item)
 
 void MainWindow::on_pushButton_clicked()
 {
-    //system("cls");
-    ////manager.calculate(5, "y");
-    //manager.showGraph();
+    
 }
 

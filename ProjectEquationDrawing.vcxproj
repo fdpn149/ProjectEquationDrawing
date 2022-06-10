@@ -190,6 +190,7 @@
     </QtMoc>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="graph.cpp" />
     <ClCompile Include="graphicsscene.cpp" />
     <ClCompile Include="graphicsview.cpp" />
     <ClCompile Include="main.cpp" />
@@ -202,6 +203,7 @@
   <ItemGroup>
     <QtMoc Include="graphicsscene.h">
     </QtMoc>
+    <ClInclude Include="graph.h" />
     <ClInclude Include="graphicsview.h" />
     <QtMoc Include="mainwindow.h">
     </QtMoc>

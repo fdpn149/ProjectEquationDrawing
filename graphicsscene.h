@@ -6,6 +6,7 @@
 #include <QPainterPath>
 #include <QGraphicsLineItem>
 #include <QGraphicsPathItem>
+#include <QGraphicsTextItem>
 #include <vector>
 #include <deque>
 
@@ -31,6 +32,8 @@ public:
     void moveScene(int x, int y);
     deque<QGraphicsLineItem*> grid_h;  //水平格線
     deque<QGraphicsLineItem*> grid_v;  //垂直格線
+    deque<QGraphicsTextItem*> text_x;  //x軸數字
+    deque<QGraphicsTextItem*> text_y;  //y軸數字
     void draw();
     void removeGraph(int index);
 private:
