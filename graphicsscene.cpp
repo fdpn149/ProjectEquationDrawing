@@ -15,14 +15,14 @@ GraphicsScene::GraphicsScene(QObject* parent, int width, int height)
 	//䢖立x軸
 	QGraphicsLineItem* xAxis = new QGraphicsLineItem();
 	xAxis->setPen(pen);
-	xAxis->setLine(0, CENTER_Y, width, CENTER_Y);
+	xAxis->setLine(0, CENTER_Y, VIEW_WIDTH, CENTER_Y);
 	this->addItem(xAxis);
 	grid_h.at(5) = xAxis;
 
 	//建立y軸
 	QGraphicsLineItem* yAxis = new QGraphicsLineItem();
 	yAxis->setPen(pen);
-	yAxis->setLine(CENTER_X, 0, CENTER_X, height);
+	yAxis->setLine(CENTER_X, 0, CENTER_X, VIEW_HEIGHT);
 	this->addItem(yAxis);
 	grid_v.at(5) = yAxis;
 
@@ -32,14 +32,14 @@ GraphicsScene::GraphicsScene(QObject* parent, int width, int height)
 		//建立y軸文字
 		QGraphicsTextItem* ytext = new QGraphicsTextItem();
 		ytext->setPlainText(QString::number(5 - i));
-		ytext->setPos(CENTER_X, i * height / 10);
+		ytext->setPos(CENTER_X, i * VIEW_HEIGHT / 10);
 		this->addItem(ytext);
 		text_y.at(i) = ytext;
 
 		//建立x軸文字
 		QGraphicsTextItem* xtext = new QGraphicsTextItem();
 		xtext->setPlainText(QString::number(i - 5));
-		xtext->setPos(i * width / 10, CENTER_Y);
+		xtext->setPos(i * VIEW_WIDTH / 10, CENTER_Y);
 		this->addItem(xtext);
 		text_x.at(i) = xtext;
 
@@ -47,13 +47,13 @@ GraphicsScene::GraphicsScene(QObject* parent, int width, int height)
 
 		QGraphicsLineItem* hGrid = new QGraphicsLineItem();
 		hGrid->setPen(pen);
-		hGrid->setLine(0, i * height / 10, width, i * height / 10);
+		hGrid->setLine(0, i * VIEW_HEIGHT / 10, VIEW_WIDTH, i * VIEW_HEIGHT / 10);
 		this->addItem(hGrid);
 		grid_h.at(i) = hGrid;
 
 		QGraphicsLineItem* vGrid = new QGraphicsLineItem();
 		vGrid->setPen(pen);
-		vGrid->setLine(i * width / 10, 0, i * width / 10, height);
+		vGrid->setLine(i * VIEW_WIDTH / 10, 0, i * VIEW_WIDTH / 10, VIEW_HEIGHT);
 		this->addItem(vGrid);
 		grid_v.at(i) = vGrid;
 	}
@@ -101,8 +101,7 @@ vector<double> GraphicsScene::create_data(double start, double end, int segment_
 
 void GraphicsScene::moveScene(int x, int y)
 {
-	QGraphicsLineItem* nowItem;
-	double x1, y1, x2, y2;
+	double new_x, new_y;
 	QPen axisPen;
 	QPen gridPen;
 	axisPen.setWidth(3);
@@ -115,7 +114,7 @@ void GraphicsScene::moveScene(int x, int y)
 	y_max += y * 10.0 / (double)VIEW_HEIGHT;
 
 	//移動格線//
-
+	QGraphicsLineItem* nowItem;
 	//垂直移動
 	if (y < 0)  //滑鼠向上拖曳(可視範圍向下增加)
 	{
@@ -124,12 +123,10 @@ void GraphicsScene::moveScene(int x, int y)
 		{
 			nowItem = grid_h.at(i);
 			this->removeItem(nowItem);
-			x1 = nowItem->line().x1();
-			y1 = nowItem->line().y1() + y;
-			x2 = nowItem->line().x2();
-			if (y1 < 0)
+			new_y = nowItem->line().y1() + y;
+			if (new_y < 0)
 			{
-				y1 = VIEW_HEIGHT + y1;
+				new_y = VIEW_HEIGHT + new_y;
 				grid_h.pop_front();
 				i--;
 				range--;
@@ -139,13 +136,13 @@ void GraphicsScene::moveScene(int x, int y)
 					nowItem->setPen(axisPen);
 				else
 					nowItem->setPen(gridPen);
-				nowItem->setLine(x1, y1, x2, y1);
+				nowItem->setLine(0, new_y, VIEW_WIDTH, new_y);
 				this->addItem(nowItem);
 				grid_h.push_back(nowItem);
 			}
 			else
 			{
-				nowItem->setLine(x1, y1, x2, y1);
+				nowItem->setLine(0, new_y, VIEW_WIDTH, new_y);
 				this->addItem(nowItem);
 			}
 		}
@@ -157,12 +154,10 @@ void GraphicsScene::moveScene(int x, int y)
 		{
 			nowItem = grid_h.at(i);
 			this->removeItem(nowItem);
-			x1 = nowItem->line().x1();
-			y1 = nowItem->line().y1() + y;
-			x2 = nowItem->line().x2();
-			if (y1 > VIEW_HEIGHT)
+			new_y = nowItem->line().y1() + y;
+			if (new_y > VIEW_HEIGHT)
 			{
-				y1 = y1 - VIEW_HEIGHT;
+				new_y = new_y - VIEW_HEIGHT;
 				grid_h.pop_back();
 				i++;
 				range++;
@@ -172,13 +167,13 @@ void GraphicsScene::moveScene(int x, int y)
 					nowItem->setPen(axisPen);
 				else
 					nowItem->setPen(gridPen);
-				nowItem->setLine(x1, y1, x2, y1);
+				nowItem->setLine(0, new_y, VIEW_WIDTH, new_y);
 				this->addItem(nowItem);
 				grid_h.push_front(nowItem);
 			}
 			else
 			{
-				nowItem->setLine(x1, y1, x2, y1);
+				nowItem->setLine(0, new_y, VIEW_WIDTH, new_y);
 				this->addItem(nowItem);
 			}
 		}
@@ -192,12 +187,10 @@ void GraphicsScene::moveScene(int x, int y)
 		{
 			nowItem = grid_v.at(i);
 			this->removeItem(nowItem);
-			y1 = nowItem->line().y1();
-			x1 = nowItem->line().x1() + x;
-			y2 = nowItem->line().y2();
-			if (x1 < 0)
+			new_x = nowItem->line().x1() + x;
+			if (new_x < 0)
 			{
-				x1 = VIEW_WIDTH + x1;
+				new_x = VIEW_WIDTH + new_x;
 				grid_v.pop_front();
 				i--;
 				range--;
@@ -207,13 +200,13 @@ void GraphicsScene::moveScene(int x, int y)
 					nowItem->setPen(axisPen);
 				else
 					nowItem->setPen(gridPen);
-				nowItem->setLine(x1, y1, x1, y2);
+				nowItem->setLine(new_x, 0, new_x, VIEW_HEIGHT);
 				this->addItem(nowItem);
 				grid_v.push_back(nowItem);
 			}
 			else
 			{
-				nowItem->setLine(x1, y1, x1, y2);
+				nowItem->setLine(new_x, 0, new_x, VIEW_HEIGHT);
 				this->addItem(nowItem);
 			}
 		}
@@ -225,12 +218,10 @@ void GraphicsScene::moveScene(int x, int y)
 		{
 			nowItem = grid_v.at(i);
 			this->removeItem(nowItem);
-			y1 = nowItem->line().y1();
-			x1 = nowItem->line().x1() + x;
-			y2 = nowItem->line().y2();
-			if (x1 > VIEW_WIDTH)
+			new_x = nowItem->line().x1() + x;
+			if (new_x > VIEW_WIDTH)
 			{
-				x1 = x1 - VIEW_WIDTH;
+				new_x = new_x - VIEW_WIDTH;
 				grid_v.pop_back();
 				i++;
 				range++;
@@ -240,19 +231,19 @@ void GraphicsScene::moveScene(int x, int y)
 					nowItem->setPen(axisPen);
 				else
 					nowItem->setPen(gridPen);
-				nowItem->setLine(x1, y1, x1, y2);
+				nowItem->setLine(new_x, 0, new_x, VIEW_HEIGHT);
 				this->addItem(nowItem);
 				grid_v.push_front(nowItem);
 			}
 			else
 			{
-				nowItem->setLine(x1, y1, x1, y2);
+				nowItem->setLine(new_x, 0, new_x, VIEW_HEIGHT);
 				this->addItem(nowItem);
 			}
 		}
 	}
 
-
+	//移動數字//
 	QGraphicsTextItem* nowTextItem;
 	//垂直移動
 	if (y < 0)  //滑鼠向上拖曳(可視範圍向下增加)
@@ -262,24 +253,24 @@ void GraphicsScene::moveScene(int x, int y)
 		{
 			nowTextItem = text_y.at(i);
 			this->removeItem(nowTextItem);
-			x1 = nowTextItem->pos().x() + x;
-			y1 = nowTextItem->pos().y() + y;
+			new_x = nowTextItem->pos().x() + x;
+			new_y = nowTextItem->pos().y() + y;
 
-			if (y1 < 0)
+			if (new_y < 0)
 			{
-				y1 = VIEW_HEIGHT + y1;
+				new_y = VIEW_HEIGHT + new_y;
 				text_y.pop_front();
 				i--;
 				range--;
 
-				nowTextItem->setPos(x1, y1);
+				nowTextItem->setPos(new_x, new_y);
 				nowTextItem->setPlainText(QString::number(text_y.at(text_y.size() - 1)->toPlainText().toDouble() - 1));
 				this->addItem(nowTextItem);
 				text_y.push_back(nowTextItem);
 			}
 			else
 			{
-				nowTextItem->setPos(x1, y1);
+				nowTextItem->setPos(new_x, new_y);
 				this->addItem(nowTextItem);
 			}
 		}
@@ -291,24 +282,24 @@ void GraphicsScene::moveScene(int x, int y)
 		{
 			nowTextItem = text_y.at(i);
 			this->removeItem(nowTextItem);
-			x1 = nowTextItem->pos().x() + x;
-			y1 = nowTextItem->pos().y() + y;
-			if (y1 > VIEW_HEIGHT)
+			new_x = nowTextItem->pos().x() + x;
+			new_y = nowTextItem->pos().y() + y;
+			if (new_y > VIEW_HEIGHT)
 			{
-				y1 = y1 - VIEW_HEIGHT;
+				new_y = new_y - VIEW_HEIGHT;
 				text_y.pop_back();
 				i++;
 				range++;
 
-				nowTextItem->setPos(x1, y1);
+				nowTextItem->setPos(new_x, new_y);
 				nowTextItem->setPlainText(QString::number(text_y.at(0)->toPlainText().toDouble() + 1));
 				this->addItem(nowTextItem);
 				text_y.push_front(nowTextItem);
 			}
 			else
 			{
-				nowTextItem->setPos(x1, y1);
-				//nowTextItem->setLine(x1, y1, x2, y1);
+				nowTextItem->setPos(new_x, new_y);
+				//nowTextItem->setLine(new_x, new_y, x2, new_y);
 				this->addItem(nowTextItem);
 			}
 		}
@@ -322,23 +313,23 @@ void GraphicsScene::moveScene(int x, int y)
 		{
 			nowTextItem = text_x.at(i);
 			this->removeItem(nowTextItem);
-			x1 = nowTextItem->pos().x() + x;
-			y1 = nowTextItem->pos().y() + y;
-			if (x1 < 0)
+			new_x = nowTextItem->pos().x() + x;
+			new_y = nowTextItem->pos().y() + y;
+			if (new_x < 0)
 			{
-				x1 = VIEW_WIDTH + x1;
+				new_x = VIEW_WIDTH + new_x;
 				text_x.pop_front();
 				i--;
 				range--;
 
-				nowTextItem->setPos(x1, y1);
+				nowTextItem->setPos(new_x, new_y);
 				nowTextItem->setPlainText(QString::number(text_x.at(text_x.size() - 1)->toPlainText().toDouble() + 1));
 				this->addItem(nowTextItem);
 				text_x.push_back(nowTextItem);
 			}
 			else
 			{
-				nowTextItem->setPos(x1, y1);
+				nowTextItem->setPos(new_x, new_y);
 				this->addItem(nowTextItem);
 			}
 		}
@@ -350,28 +341,108 @@ void GraphicsScene::moveScene(int x, int y)
 		{
 			nowTextItem = text_x.at(i);
 			this->removeItem(nowTextItem);
-			x1 = nowTextItem->pos().x() + x;
-			y1 = nowTextItem->pos().y() + y;
-			if (x1 > VIEW_WIDTH)
+			new_x = nowTextItem->pos().x() + x;
+			new_y = nowTextItem->pos().y() + y;
+			if (new_x > VIEW_WIDTH)
 			{
-				x1 = x1 - VIEW_WIDTH;
+				new_x = new_x - VIEW_WIDTH;
 				text_x.pop_back();
 				i++;
 				range++;
 
-				nowTextItem->setPos(x1, y1);
+				nowTextItem->setPos(new_x, new_y);
 				nowTextItem->setPlainText(QString::number(text_x.at(0)->toPlainText().toDouble() - 1));
 				this->addItem(nowTextItem);
 				text_x.push_front(nowTextItem);
 			}
 			else
 			{
-				nowTextItem->setPos(x1, y1);
+				nowTextItem->setPos(new_x, new_y);
 				this->addItem(nowTextItem);
 			}
 		}
 	}
 
+	//超出邊界時需吸付在邊邊//
+	//y軸數字判斷
+	if (xGridMax + xGridMin > 9)
+	{
+		new_x = 0;
+		for (int i = 0; i < 10; i++)
+		{
+			nowTextItem = text_y.at(i);
+			this->removeItem(nowTextItem);
+			nowTextItem->setPos(new_x, nowTextItem->pos().y());
+			this->addItem(nowTextItem);
+		}
+	}
+	else if (xGridMax + xGridMin < -9)
+	{
+		for (int i = 0; i < 10; i++)
+		{
+			nowTextItem = text_y.at(i);
+			new_x = VIEW_WIDTH- nowTextItem->boundingRect().width();
+			this->removeItem(nowTextItem);
+			nowTextItem->setPos(new_x, nowTextItem->pos().y());
+			this->addItem(nowTextItem);
+		}
+	}
+	else
+	{
+		for (int i = 0; i < 10; i++)
+			if (grid_v.at(i)->pen() == axisPen)
+			{
+				new_x = grid_v.at(i)->line().x1();
+				break;
+			}
+		for (int i = 0; i < 10; i++)
+		{
+			nowTextItem = text_y.at(i);
+			this->removeItem(nowTextItem);
+			nowTextItem->setPos(new_x, nowTextItem->pos().y());
+			this->addItem(nowTextItem);
+		}
+	}
+
+	//x軸數字判斷
+	if (yGridMax + yGridMin > 9)
+	{
+		new_y = VIEW_HEIGHT - text_x.at(0)->boundingRect().height();
+		for (int i = 0; i < 10; i++)
+		{
+			nowTextItem = text_x.at(i);
+			this->removeItem(nowTextItem);
+			nowTextItem->setPos(nowTextItem->pos().x(), new_y);
+			this->addItem(nowTextItem);
+		}
+	}
+	else if (yGridMax + yGridMin < -9)
+	{
+		new_y = 0;
+		for (int i = 0; i < 10; i++)
+		{
+			nowTextItem = text_x.at(i);
+			this->removeItem(nowTextItem);
+			nowTextItem->setPos(nowTextItem->pos().x(), new_y);
+			this->addItem(nowTextItem);
+		}
+	}
+	else
+	{
+		for (int i = 0; i < 10; i++)
+			if (grid_h.at(i)->pen() == axisPen)
+			{
+				new_y = grid_h.at(i)->line().y1();
+				break;
+			}
+		for (int i = 0; i < 10; i++)
+		{
+			nowTextItem = text_x.at(i);
+			this->removeItem(nowTextItem);
+			nowTextItem->setPos(nowTextItem->pos().x(), new_y);
+			this->addItem(nowTextItem);
+		}
+	}
 
 	manager.showGraph();
 }

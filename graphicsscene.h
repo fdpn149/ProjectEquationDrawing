@@ -24,10 +24,10 @@ public:
     int xGridMax = 4;  //x格線的最大值
     int yGridMin = -4;  //y格線的最小值
     int yGridMax = 5;  //y格線的最大值
-    double x_min = -5;
-    double x_max = 5;
-    double y_min = -5;
-    double y_max = 5;
+    double x_min = -5;  //x坐標在顯示範圍的最小值
+    double x_max = 5;  //x坐標在顯示範圍的最大值
+    double y_min = -5;  //y坐標在顯示範圍的最小值
+    double y_max = 5;  //y坐標在顯示範圍最大值
     vector<double> create_data(double start, double end, int segment_count, int index);
     void moveScene(int x, int y);
     deque<QGraphicsLineItem*> grid_h;  //水平格線
@@ -41,6 +41,7 @@ private:
     const int VIEW_HEIGHT;  //介面高度
     const int CENTER_X;  //中心的X坐標
     const int CENTER_Y;  //中心的Y坐標
+
 };
 
 #endif//GRAPHICSSCENE_H
