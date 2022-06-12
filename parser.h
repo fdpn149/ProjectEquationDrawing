@@ -34,6 +34,7 @@ public:
 	calculate_error(string str) : s(str) {}
 };
 
+class divided_by_zero{};
 
 #endif // PARSER_H
 

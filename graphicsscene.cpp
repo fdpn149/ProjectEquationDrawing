@@ -87,10 +87,16 @@ vector<double> GraphicsScene::create_data(double start, double end, int segment_
 		}
 		catch (std::exception& e) {
 			string w = e.what();
-			if (w.at(0) == '-')
-				data.push_back(std::numeric_limits<double>::min());
-			else
-				data.push_back(std::numeric_limits<double>::max());
+			if (w != "cannot find variable")
+			{
+				if (w.at(0) == '-')
+					data.push_back(-std::numeric_limits<double>::infinity());
+				else
+					data.push_back(std::numeric_limits<double>::infinity());
+			}
+		}
+		catch (divided_by_zero) {
+			throw;
 		}
 		x += delta;
 	}
@@ -380,7 +386,7 @@ void GraphicsScene::moveScene(int x, int y)
 		for (int i = 0; i < 10; i++)
 		{
 			nowTextItem = text_y.at(i);
-			new_x = VIEW_WIDTH- nowTextItem->boundingRect().width();
+			new_x = VIEW_WIDTH - nowTextItem->boundingRect().width();
 			this->removeItem(nowTextItem);
 			nowTextItem->setPos(new_x, nowTextItem->pos().y());
 			this->addItem(nowTextItem);
@@ -448,63 +454,73 @@ void GraphicsScene::moveScene(int x, int y)
 
 void GraphicsScene::draw()
 {
+	double inf = std::numeric_limits<double>::infinity();
+
 	for (int i = 0; i < Storage::graphs.size(); i++)
 	{
-		if (Storage::graphs.at(i)->status == 1 && Storage::graphs.at(i)->name == "y")
-		{
-			vector<double> data = create_data(x_min, x_max, 500.0, i);
-
-			double delta_x = (double)VIEW_WIDTH / 500.0;
-			double delta_y = -(double)VIEW_HEIGHT / 10.0;
-
-			double start_x = 0.0;
-
-			QPainterPath path;
-
-			double num = data[0] * delta_y + CENTER_Y + (y_max - 5) * VIEW_WIDTH / 10.0;
-			if(num != std::numeric_limits<double>::min() && num == std::numeric_limits<double>::max())
-			path.moveTo(start_x, num);
-			
-			bool skip = false;
-			for (size_t i = 1; i <= 500; ++i)
+		try {
+			if (Storage::graphs.at(i)->status == 1 && Storage::graphs.at(i)->name == "y")
 			{
-				start_x += delta_x;
-				if (skip)
+				vector<double> data = create_data(x_min, x_max, 500.0, i);
+
+				double delta_x = (double)VIEW_WIDTH / 500.0;
+				double delta_y = -(double)VIEW_HEIGHT / 10.0;
+
+				double start_x = 0.0;
+
+				QPainterPath path;
+
+				double num = data[0] * delta_y + CENTER_Y + (y_max - 5) * VIEW_WIDTH / 10.0;
+				if (num != inf && num != -inf)
+					path.moveTo(start_x, num);
+
+				bool skip = false;
+				for (size_t i = 1; i <= 500; ++i)
 				{
-					if (data[i] != std::numeric_limits<double>::min() && data[i] != std::numeric_limits<double>::max())
+					start_x += delta_x;
+					if (skip)
 					{
 						num = data[i] * delta_y + CENTER_Y + (y_max - 5) * VIEW_WIDTH / 10.0;
-						path.moveTo(start_x, num);
-						skip = false;
+						if (num != inf && num != -inf)
+						{
+							path.moveTo(start_x, num);
+							skip = false;
+						}
 					}
+
+					if (data[i] == inf || data[i] == -inf)
+						skip = true;
+					else
+						path.lineTo(start_x, data[i] * delta_y + CENTER_Y + (y_max - 5) * VIEW_WIDTH / 10.0);
 				}
-
-				if (data[i] == std::numeric_limits<double>::min() || data[i] == std::numeric_limits<double>::max())
-					skip = true;
+				QGraphicsPathItem* pathItem;
+				if (Storage::graphs.at(i)->graph != nullptr)
+				{
+					pathItem = Storage::graphs.at(i)->graph;
+					this->removeItem(Storage::graphs.at(i)->graph);
+				}
 				else
-					path.lineTo(start_x, data[i] * delta_y + CENTER_Y + (y_max - 5) * VIEW_WIDTH / 10.0);
-			}
-			QGraphicsPathItem* pathItem;
-			if (Storage::graphs.at(i)->graph != nullptr)
-			{
-				pathItem = Storage::graphs.at(i)->graph;
-				this->removeItem(Storage::graphs.at(i)->graph);
-			}
-			else
-				pathItem = new QGraphicsPathItem();
-			pathItem->setPath(path);
-			QPen pen;
-			pen.setColor(Storage::graphs.at(i)->color);
-			pen.setWidth(2);
-			pathItem->setPen(pen);
+					pathItem = new QGraphicsPathItem();
+				pathItem->setPath(path);
+				QPen pen;
+				pen.setColor(Storage::graphs.at(i)->color);
+				pen.setWidth(2);
+				pathItem->setPen(pen);
 
-			Storage::graphs.at(i)->graph = pathItem;
-			this->addItem(pathItem);
+				Storage::graphs.at(i)->graph = pathItem;
+				this->addItem(pathItem);
+			}
+		}
+		catch (divided_by_zero) {
+
 		}
 	}
 }
 
 void GraphicsScene::removeGraph(int index)
 {
-	this->removeItem(Storage::graphs.at(index)->graph);
+	if (Storage::graphs.at(index)->graph != nullptr)
+		this->removeItem(Storage::graphs.at(index)->graph);
+	delete Storage::graphs.at(index)->graph;
+	Storage::graphs.at(index)->graph = nullptr;
 }

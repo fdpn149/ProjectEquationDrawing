@@ -29,6 +29,8 @@ void Manager::input(string input, QListWidgetItem* item, int nowRow)
 	clearQueue(storage.infix);  //清除中序Queue
 	storage.postfix.clear();  //清除後序Vector
 	string origin_name = Storage::graphs.at(nowRow)->name;
+	if (origin_name == "y")
+		viewer->removeGraph(nowRow);
 	Storage::graphs.at(nowRow)->clear();
 	string name = parser.parseInput(input, storage, nowRow);  //輸入解析
 
@@ -44,13 +46,15 @@ void Manager::input(string input, QListWidgetItem* item, int nowRow)
 	{
 		viewer->changeItemIcon(item, -1, Storage::graphs.at(nowRow)->color);
 		Storage::graphs.at(nowRow)->status = -1;
+		if (origin_name == "y")
+			viewer->removeGraph(nowRow);
 		clearQueue(storage.infix);
 	}
 
 	set<string> var_before;  //這一列之前/之後的變數集合
 	for (int i = 0; i <= nowRow; i++)
 	{
-		if (Storage::graphs.at(i)->status == 1)
+		if (Storage::graphs.at(i)->name != "y" && Storage::graphs.at(i)->status == 1)
 			var_before.insert(Storage::graphs.at(i)->name);
 	}
 
@@ -66,7 +70,7 @@ void Manager::input(string input, QListWidgetItem* item, int nowRow)
 		{
 			for (string s : Storage::graphs.at(i)->postfix)
 			{
-				if (isalpha(s.at(0)) && s != "sin" && s != "cos")
+				if (isalpha(s.at(0)) && s != "sin" && s != "cos" && s != "x")
 				{
 					if (var_before.find(s) == var_before.end())
 					{
@@ -90,6 +94,8 @@ void Manager::input(string input, QListWidgetItem* item, int nowRow)
 		{
 			viewer->changeItemIcon(i, 0, Storage::graphs.at(i)->color);
 			Storage::graphs.at(i)->status = 1;
+			if (Storage::graphs.at(i)->name != "y")
+				var_before.insert(Storage::graphs.at(i)->name);
 		}
 	}
 }
@@ -106,6 +112,12 @@ double Manager::calculate(double x, int index)
 		{
 			Storage::graphs.at(index)->status = -1;
 		}
+		throw;
+	}
+	catch (divided_by_zero) {
+		viewer->changeItemIcon(index, -1, Storage::graphs.at(index)->color);
+		Storage::graphs.at(index)->status = -1;
+		viewer->removeGraph(index);
 		throw;
 	}
 }

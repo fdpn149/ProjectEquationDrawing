@@ -15,7 +15,7 @@ public:
 	QGraphicsPathItem* graph;
 	int status;  //-1:Error, 0:empty, 1:correct
 
-	Graph(QColor c) : color(c), graph(nullptr), status(0) {}
+	Graph(QColor c) : color(c), graph(nullptr), status(1) {}
 	void clear();
 };
 

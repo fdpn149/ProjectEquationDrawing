@@ -288,7 +288,7 @@ void Parser::toPostfix(queue<string> infix, vector<string>& postfix)
 
 double Parser::calculate(double x, vector<Graph*>::reverse_iterator rbegin, vector<Graph*>::reverse_iterator rend)
 {
-	if((*rbegin)->status == -1) throw calculate_error("cannot find variable");
+	if ((*rbegin)->status == -1) throw calculate_error("cannot find variable");
 
 	vector<string> postfix = (*rbegin)->postfix;
 
@@ -297,9 +297,7 @@ double Parser::calculate(double x, vector<Graph*>::reverse_iterator rbegin, vect
 		string& now = postfix.at(i);
 		if (!isOperator(now))  //若不是運算符號
 		{
-			if (now == "x")
-				now = to_string(x);
-			else if (!isdigit(now.at(0)))  //判斷是否是變數
+			if (now != "x" && !isdigit(now.at(0)))  //判斷是否是變數
 			{
 				auto rit = findVariable(rbegin, Storage::graphs.rend(), now);
 				if (rit != Storage::graphs.rend())
@@ -317,8 +315,24 @@ double Parser::calculate(double x, vector<Graph*>::reverse_iterator rbegin, vect
 		else  //是運算符號
 		{
 			double pre1 = 0, pre2 = 0;  //前兩項的數值
-			if (i - 1 >= 0) pre1 = stod(postfix.at(i - 1));
-			if (i - 2 >= 0) pre2 = stod(postfix.at(i - 2));
+			if (i - 2 >= 0)
+			{
+				if (postfix.at(i - 2) == "x")
+					pre2 = x;
+				else
+					pre2 = stod(postfix.at(i - 2));
+				if (postfix.at(i - 1) == "x")
+					pre1 = x;
+				else if (now != "/" || std::stod(postfix.at(i - 1)) != 0)
+					pre1 = stod(postfix.at(i - 1));
+				else
+					throw divided_by_zero();
+			}
+			else if (i - 1 >= 0)
+				if(postfix.at(i - 1) == "x")
+					pre1 = x;
+				else
+					pre1 = stod(postfix.at(i - 1));
 
 			if (now.size() > 1 && i - 1 >= 0)  //sin/cos/負號
 			{
@@ -352,5 +366,8 @@ double Parser::calculate(double x, vector<Graph*>::reverse_iterator rbegin, vect
 			}
 		}
 	}
+
+	if (postfix.at(0) == "x")
+		return x;
 	return stod(postfix.at(0));
 }
