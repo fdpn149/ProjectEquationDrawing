@@ -3,6 +3,8 @@
 #include "graphicsscene.h"
 #include<ctime>
 #include<cstdlib>
+#include<set>
+using std::set;
 
 Manager manager;
 
@@ -32,52 +34,63 @@ void Manager::input(string input, QListWidgetItem* item, int nowRow)
 
 	if (name != "")
 	{
+		Storage::graphs.at(nowRow)->status = 1;
 		viewer->changeItemIcon(item, 0, Storage::graphs.at(nowRow)->color);
-
 		parser.toPostfix(storage.infix, storage.postfix);  //中序轉後序
-
-
-		
 		Storage::graphs.at(nowRow)->name = name;  //設定名字
 		Storage::graphs.at(nowRow)->postfix = storage.postfix;  //儲存後序式
-
-		if (origin_name != name)
-		{
-			//檢查是否有變數重複定義
-			for (int i = 0; i < Storage::graphs.size(); i++)
-			{
-				string now_name = Storage::graphs.at(i)->name;
-				if (now_name != "y")  //跳過檢查y
-				{
-					int total = std::count_if(Storage::graphs.begin(), Storage::graphs.end(),
-						[now_name](Graph* g) {return now_name == g->name; });
-					int k = Storage::graphs.size() - 1;
-					for (int j = total; j > 1; j--)
-					{
-						while (Storage::graphs.at(k)->name != now_name) k--;
-						Storage::graphs.at(k)->clear();
-						viewer->changeItemIcon(k, -1, Storage::graphs.at(k)->color);
-					}
-				}
-
-				if (!Storage::graphs.at(i)->postfix.empty())
-				{
-					for (int j = 0; j < Storage::graphs.at(i)->postfix.size(); j++)
-					{
-						if (Storage::graphs.at(i)->postfix.at(j) == origin_name)
-						{
-							Storage::graphs.at(i)->clear();
-							viewer->changeItemIcon(i, -1, Storage::graphs.at(i)->color);
-						}
-					}
-				}
-			}
-		}
 	}
 	else
 	{
 		viewer->changeItemIcon(item, -1, Storage::graphs.at(nowRow)->color);
+		Storage::graphs.at(nowRow)->status = -1;
 		clearQueue(storage.infix);
+	}
+
+	set<string> var_before;  //這一列之前/之後的變數集合
+	for (int i = 0; i <= nowRow; i++)
+	{
+		if (Storage::graphs.at(i)->status == 1)
+			var_before.insert(Storage::graphs.at(i)->name);
+	}
+
+	for (int i = nowRow + 1; i < Storage::graphs.size(); i++)
+	{
+		bool error = false;
+		if (var_before.find(Storage::graphs.at(i)->name) != var_before.end())  //重複定義變數
+		{
+			Storage::graphs.at(i)->clear();
+			error = true;
+		}
+		else
+		{
+			for (string s : Storage::graphs.at(i)->postfix)
+			{
+				if (isalpha(s.at(0)) && s != "sin" && s != "cos")
+				{
+					if (var_before.find(s) == var_before.end())
+					{
+						error = true;
+						break;
+					}
+				}
+			}
+		}
+		if (error)
+		{
+			viewer->changeItemIcon(i, -1, Storage::graphs.at(i)->color);
+			Storage::graphs.at(i)->status = -1;
+			if (Storage::graphs.at(i)->name == "y")
+			{
+				viewer->removeGraph(i);
+				Storage::graphs.at(i)->graph = nullptr;
+			}
+		}
+		else
+		{
+			viewer->changeItemIcon(i, 0, Storage::graphs.at(i)->color);
+			Storage::graphs.at(i)->status = 1;
+		}
 	}
 }
 
@@ -88,7 +101,11 @@ double Manager::calculate(double x, int index)
 		return parser.calculate(x, Storage::graphs.rbegin() + rindex, Storage::graphs.rend());
 	}
 	catch (std::exception& e) {
-		viewer->addText(e.what());
+		string text = e.what();
+		if (text == "cannot find variable")
+		{
+			Storage::graphs.at(index)->status = -1;
+		}
 		throw;
 	}
 }
@@ -125,14 +142,15 @@ void Manager::addNewItem()
 
 void Manager::editItem(QListWidgetItem* item, int nowRow)
 {
-	//Storage::graphs.at(nowRow)->clear();
 	item->setFlags(item->flags() | Qt::ItemIsEditable);
 	viewer->editItem(item, Storage::graphs.at(nowRow)->color);
 }
 
 void Manager::removeItem(QListWidgetItem* item, int nowRow)
 {
-	viewer->removeGraph(nowRow);
+	string name = Storage::graphs.at(nowRow)->name;
+	if (name == "y")
+		viewer->removeGraph(nowRow);
 	Storage::graphs.erase(Storage::graphs.begin() + nowRow);
 }
 

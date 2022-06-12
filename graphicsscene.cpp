@@ -76,12 +76,11 @@ GraphicsScene::~GraphicsScene()
 vector<double> GraphicsScene::create_data(double start, double end, int segment_count, int index)
 {
 	double delta = (end - start) / (double)segment_count;
-	size_t point_count = segment_count + 1;
 
 	vector<double> data;
 	double x = start;
 
-	for (size_t i = 0; i < point_count; ++i)
+	for (size_t i = 0; i <= segment_count; ++i)
 	{
 		try {
 			data.push_back(manager.calculate(x, index));
@@ -451,25 +450,33 @@ void GraphicsScene::draw()
 {
 	for (int i = 0; i < Storage::graphs.size(); i++)
 	{
-		if (Storage::graphs.at(i)->name == "y")
+		if (Storage::graphs.at(i)->status == 1 && Storage::graphs.at(i)->name == "y")
 		{
-			vector<double> data = create_data(x_min, x_max, 100.0, i);
+			vector<double> data = create_data(x_min, x_max, 500.0, i);
 
-			double delta_x = (double)VIEW_WIDTH / 100.0;
+			double delta_x = (double)VIEW_WIDTH / 500.0;
 			double delta_y = -(double)VIEW_HEIGHT / 10.0;
 
 			double start_x = 0.0;
 
 			QPainterPath path;
-			path.moveTo(start_x, data[0] * delta_y + CENTER_Y + (y_max - 5) * VIEW_WIDTH / 10.0);
+
+			double num = data[0] * delta_y + CENTER_Y + (y_max - 5) * VIEW_WIDTH / 10.0;
+			if(num != std::numeric_limits<double>::min() && num == std::numeric_limits<double>::max())
+			path.moveTo(start_x, num);
+			
 			bool skip = false;
-			for (size_t i = 1; i < 101; ++i)
+			for (size_t i = 1; i <= 500; ++i)
 			{
 				start_x += delta_x;
 				if (skip)
 				{
-					path.moveTo(start_x, data[i] * delta_y + CENTER_Y + (y_max - 5) * VIEW_WIDTH / 10.0);
-					skip = false;
+					if (data[i] != std::numeric_limits<double>::min() && data[i] != std::numeric_limits<double>::max())
+					{
+						num = data[i] * delta_y + CENTER_Y + (y_max - 5) * VIEW_WIDTH / 10.0;
+						path.moveTo(start_x, num);
+						skip = false;
+					}
 				}
 
 				if (data[i] == std::numeric_limits<double>::min() || data[i] == std::numeric_limits<double>::max())

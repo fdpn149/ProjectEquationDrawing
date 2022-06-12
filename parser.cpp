@@ -167,10 +167,14 @@ string Parser::parseInput(string input, Storage& storage, int nowRow)
 			if (name == "y")
 				return "";
 
+			auto variable_it = findVariable(Storage::graphs.rbegin() + Storage::graphs.size() - nowRow - 1,
+				Storage::graphs.rend(), name);
+
 			//若變數與等號前的變數相同 或 找不到變數
-			if (name == v1 || (name != "x" && findVariable(Storage::graphs.rbegin() + Storage::graphs.size() - nowRow - 1,
-				Storage::graphs.rend(), name) == Storage::graphs.rend()))
+			if (name == v1 || (name != "x" && variable_it == Storage::graphs.rend()))
 				return "";
+
+			if ((*variable_it)->status == -1) return "";
 
 			storage.infix.push(name);
 			now_code = 64;
@@ -284,6 +288,8 @@ void Parser::toPostfix(queue<string> infix, vector<string>& postfix)
 
 double Parser::calculate(double x, vector<Graph*>::reverse_iterator rbegin, vector<Graph*>::reverse_iterator rend)
 {
+	if((*rbegin)->status == -1) throw calculate_error("cannot find variable");
+
 	vector<string> postfix = (*rbegin)->postfix;
 
 	for (int i = 0; i < postfix.size(); i++)
@@ -302,7 +308,10 @@ double Parser::calculate(double x, vector<Graph*>::reverse_iterator rbegin, vect
 					now = to_string(num);  //將該項取代成數值
 				}
 				else
+				{
+					(*rbegin)->status = -1;
 					throw calculate_error("cannot find variable");
+				}
 			}
 		}
 		else  //是運算符號
