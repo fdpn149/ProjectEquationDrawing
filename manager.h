@@ -21,6 +21,7 @@ public:
 	void addNewItem();
 	void editItem(QListWidgetItem* item, int nowRow);
 	void removeItem(QListWidgetItem* item, int nowRow);
+	void removeGraph(int index);
 	double calculate(double x, int index);
 	void showGraph();
 };

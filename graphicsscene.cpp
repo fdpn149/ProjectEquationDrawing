@@ -80,6 +80,7 @@ vector<double> GraphicsScene::create_data(double start, double end, int segment_
 	vector<double> data;
 	double x = start;
 
+	int diByZero_count = 0;
 	for (size_t i = 0; i <= segment_count; ++i)
 	{
 		try {
@@ -96,7 +97,10 @@ vector<double> GraphicsScene::create_data(double start, double end, int segment_
 			}
 		}
 		catch (divided_by_zero) {
-			throw;
+			diByZero_count++;
+			data.push_back(std::numeric_limits<double>::infinity());
+			if (diByZero_count > segment_count)
+				throw;
 		}
 		x += delta;
 	}
@@ -512,7 +516,7 @@ void GraphicsScene::draw()
 			}
 		}
 		catch (divided_by_zero) {
-
+			manager.removeGraph(i);
 		}
 	}
 }

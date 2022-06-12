@@ -29,8 +29,8 @@ void Manager::input(string input, QListWidgetItem* item, int nowRow)
 	clearQueue(storage.infix);  //清除中序Queue
 	storage.postfix.clear();  //清除後序Vector
 	string origin_name = Storage::graphs.at(nowRow)->name;
-	if (origin_name == "y")
-		viewer->removeGraph(nowRow);
+	for(int i = 0; i < Storage::graphs.size(); i++)
+		viewer->removeGraph(i);
 	Storage::graphs.at(nowRow)->clear();
 	string name = parser.parseInput(input, storage, nowRow);  //輸入解析
 
@@ -115,9 +115,6 @@ double Manager::calculate(double x, int index)
 		throw;
 	}
 	catch (divided_by_zero) {
-		viewer->changeItemIcon(index, -1, Storage::graphs.at(index)->color);
-		Storage::graphs.at(index)->status = -1;
-		viewer->removeGraph(index);
 		throw;
 	}
 }
@@ -164,5 +161,12 @@ void Manager::removeItem(QListWidgetItem* item, int nowRow)
 	if (name == "y")
 		viewer->removeGraph(nowRow);
 	Storage::graphs.erase(Storage::graphs.begin() + nowRow);
+}
+
+void Manager::removeGraph(int index)
+{
+	viewer->changeItemIcon(index, -1, Storage::graphs.at(index)->color);
+	Storage::graphs.at(index)->status = -1;
+	viewer->removeGraph(index);
 }
 
