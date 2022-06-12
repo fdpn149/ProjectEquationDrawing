@@ -174,7 +174,7 @@ string Parser::parseInput(string input, Storage& storage, int nowRow)
 			if (name == v1 || (name != "x" && variable_it == Storage::graphs.rend()))
 				return "";
 
-			if ((*variable_it)->status == -1) return "";
+			if (variable_it != Storage::graphs.rend() && (*variable_it)->status == -1) return "";
 
 			storage.infix.push(name);
 			now_code = 64;

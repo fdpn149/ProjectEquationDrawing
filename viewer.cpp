@@ -2,6 +2,7 @@
 #include "mainwindow.h"
 #include <iostream>
 #include <QPainter>
+#include <QCheckBox>
 using std::cout;
 using std::endl;
 
@@ -32,6 +33,8 @@ void Viewer::addItem(QColor color)
 	QListWidgetItem* item = new QListWidgetItem("");
 	item->setIcon(pixmap);
 	item->setFont(QFont("Microsoft JhengHei UI", 20));
+	item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+	item->setCheckState(Qt::Checked);
     window.ui->listWidget->addItem(item);
 }
 
