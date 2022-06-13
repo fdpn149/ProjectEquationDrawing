@@ -273,7 +273,7 @@ void GraphicsScene::moveScene(int x, int y)
 				range--;
 
 				nowTextItem->setPos(new_x, new_y);
-				nowTextItem->setPlainText(QString::number(text_y.at(text_y.size() - 1)->toPlainText().toDouble() - 1));
+				nowTextItem->setPlainText(QString::number(text_y.at(text_y.size() - 1)->toPlainText().toDouble() - scaleValue));
 				this->addItem(nowTextItem);
 				text_y.push_back(nowTextItem);
 			}
@@ -301,7 +301,7 @@ void GraphicsScene::moveScene(int x, int y)
 				range++;
 
 				nowTextItem->setPos(new_x, new_y);
-				nowTextItem->setPlainText(QString::number(text_y.at(0)->toPlainText().toDouble() + 1));
+				nowTextItem->setPlainText(QString::number(text_y.at(0)->toPlainText().toDouble() + scaleValue));
 				this->addItem(nowTextItem);
 				text_y.push_front(nowTextItem);
 			}
@@ -332,7 +332,7 @@ void GraphicsScene::moveScene(int x, int y)
 				range--;
 
 				nowTextItem->setPos(new_x, new_y);
-				nowTextItem->setPlainText(QString::number(text_x.at(text_x.size() - 1)->toPlainText().toDouble() + 1));
+				nowTextItem->setPlainText(QString::number(text_x.at(text_x.size() - 1)->toPlainText().toDouble() + scaleValue));
 				this->addItem(nowTextItem);
 				text_x.push_back(nowTextItem);
 			}
@@ -360,7 +360,7 @@ void GraphicsScene::moveScene(int x, int y)
 				range++;
 
 				nowTextItem->setPos(new_x, new_y);
-				nowTextItem->setPlainText(QString::number(text_x.at(0)->toPlainText().toDouble() - 1));
+				nowTextItem->setPlainText(QString::number(text_x.at(0)->toPlainText().toDouble() - scaleValue));
 				this->addItem(nowTextItem);
 				text_x.push_front(nowTextItem);
 			}
@@ -460,6 +460,12 @@ void GraphicsScene::zoomScene(QPointF point)
 {
 	const double zoom_x = point.x();
 	const double zoom_y = point.y();
+	scaleValue /= 2;
+	for (int i = 0; i < 10; i++)
+	{
+		text_x.at(i)->setPlainText(QString::number(text_x.at(i)->toPlainText().toDouble() / 2));
+		text_y.at(i)->setPlainText(QString::number(text_y.at(i)->toPlainText().toDouble() / 2));
+	}
 	moveScene(CENTER_X - zoom_x, CENTER_Y - zoom_y);
 }
 

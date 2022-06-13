@@ -57,8 +57,8 @@ void GraphicsView::wheelEvent(QWheelEvent* event)
 
     QPointF view_pos = event->position();
     
-    system("cls");
-    std::cout << "viewPos=  " << view_pos.x() << "  " << view_pos.y() << std::endl;
+    //system("cls");
+    // std::cout << "viewPos=  " << view_pos.x() << "  " << view_pos.y() << std::endl;
 
     scene->zoomScene(view_pos);
 
