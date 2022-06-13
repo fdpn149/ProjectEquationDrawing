@@ -51,14 +51,10 @@ void GraphicsView::mouseMoveEvent(QMouseEvent* event)
 void GraphicsView::wheelEvent(QWheelEvent* event)
 {
     double factor = 2;
-
     if (event->angleDelta().y() < 0)
         factor = 0.5;
 
     QPointF view_pos = event->position();
-    
-    //system("cls");
-    // std::cout << "viewPos=  " << view_pos.x() << "  " << view_pos.y() << std::endl;
 
     scene->zoomScene(view_pos, factor);
 

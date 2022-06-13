@@ -429,6 +429,8 @@ void GraphicsScene::moveScene(int x, int y)
 
 void GraphicsScene::zoomScene(QPointF point, double scale)
 {
+	if (scaleValue <= 0.0625 && scale > 1) return;
+
 	const double zoom_x = point.x();
 	const double zoom_y = point.y();
 	scaleValue /= scale;
@@ -483,23 +485,22 @@ void GraphicsScene::zoomScene(QPointF point, double scale)
 	}
 }
 
-vector<double> GraphicsScene::create_data(double start, double end, int segment_count, int index)
+vector<double> GraphicsScene::calculateGraph(double first, double last, int count, int index)
 {
-	double delta = (end - start) / (double)segment_count;
+	vector<double> data;  //存函數數值
+	double dx = (last - first) / (double)count;  //x的間距
+	int diByZero_count = 0;  //除以零的次數
+	double x = first;  //先將x設為第1項
 
-	vector<double> data;
-	double x = start;
-
-	int diByZero_count = 0;
-	for (size_t i = 0; i <= segment_count; ++i)
+	for (int i = 0; i <= count; i++)
 	{
 		try {
-			data.push_back(manager.calculate(x, index));
+			data.push_back(manager.calculate(x, index));  //計算函數值
 		}
 		catch (divided_by_zero) {
 			diByZero_count++;
 			data.push_back(std::numeric_limits<double>::infinity());
-			if (diByZero_count > segment_count)
+			if (diByZero_count > count)  //如果函數的每一項都是除以0
 				throw;
 		}
 		catch (std::exception& e) {
@@ -512,53 +513,82 @@ vector<double> GraphicsScene::create_data(double start, double end, int segment_
 					data.push_back(std::numeric_limits<double>::infinity());
 			}
 		}
-		x += delta;
+		x += dx;
 	}
 
 	return data;
 }
 
+double GraphicsScene::to_view_y(double value)
+{
+	if (value == INF || value == -INF)  //若數值為正負無限大
+		return value;  //直接回傳
+	return (y_max - value) * 521 / (y_max - y_min);  //回傳轉換後的數值
+}
+
 void GraphicsScene::draw()
 {
-	double inf = std::numeric_limits<double>::infinity();
-
 	for (int i = 0; i < Storage::graphs.size(); i++)
 	{
 		try {
+			//若找到y=的項，而且狀態為顯示
 			if (Storage::graphs.at(i)->status == 1 && Storage::graphs.at(i)->name == "y")
 			{
-				vector<double> data = create_data(x_min, x_max, 500.0, i);
+				vector<double> data;  //儲存函數值
+				double precision;  //x的精確度(間距)
 
-				double delta_x = (double)VIEW_WIDTH / 500.0;
-				double delta_y = -(double)VIEW_HEIGHT / 10.0;
+				if (scaleValue > 1)  //若縮放倍率大於1
+					precision = PRECISION * scaleValue;  //精確度設為縮放倍率÷放大倍率
+				else  //若縮放倍率不大於1
+					precision = PRECISION;  //精確度設為預設倍率
 
-				double start_x = 0.0;
+				data = calculateGraph(x_min, x_max, precision, i);  //計算y的值，存入data
 
-				QPainterPath path;
+				double dx = (double)VIEW_WIDTH / precision;  //x在畫面的間距
 
-				double num = data[0] * delta_y + CENTER_Y + (y_max - 5) * VIEW_WIDTH / 10.0;
-				if (num != inf && num != -inf)
-					path.moveTo(start_x, num);
+				QPainterPath path;  //儲存函數路徑
 
-				bool skip = false;
-				for (size_t i = 1; i <= 500; ++i)
+				double x = 0;  //x初始設為0
+				double y = to_view_y(data.at(0));  //y初始設為第0項
+				bool need_move = false;
+
+				double last_y;  //上一個y
+				if (y != INF && y != -INF)  //若y不為正負無限大
 				{
-					start_x += delta_x;
-					if (skip)
+					path.moveTo(x, y);  //移動到(x,y)
+					last_y = y;
+				}
+				else
+					need_move = true;  //因為尚未移動，故將need_move設為true
+
+				for (int i = 1; i <= precision; i++)
+				{
+					x += dx;
+					y = to_view_y(data.at(i));
+					
+					if (need_move)
 					{
-						num = data[i] * delta_y + CENTER_Y + (y_max - 5) * VIEW_WIDTH / 10.0;
-						if (num != inf && num != -inf)
+						if (y != INF && y != -INF)
 						{
-							path.moveTo(start_x, num);
-							skip = false;
+							path.moveTo(x, y);
+							need_move = false;
+							last_y = y;
 						}
 					}
-
-					if (data[i] == inf || data[i] == -inf)
-						skip = true;
 					else
-						path.lineTo(start_x, data[i] * delta_y + CENTER_Y + (y_max - 5) * VIEW_WIDTH / 10.0);
+					{
+						if (y == INF || y == -INF || (fabs(y - last_y) > 5000))
+						{
+							need_move = true;
+						}
+						else
+						{
+							path.lineTo(x, y);
+							last_y = y;
+						}
+					}
 				}
+
 				QGraphicsPathItem* pathItem;
 				if (Storage::graphs.at(i)->graph != nullptr)
 				{

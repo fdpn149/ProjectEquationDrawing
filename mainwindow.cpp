@@ -35,10 +35,12 @@ void MainWindow::on_listWidget_commitData()
 	{
 		manager.removeItem(item, nowRow);
 		ui->listWidget->takeItem(nowRow);  //從列表中移除物品
+		manager.checkError(-1);
 	}
 	else
 	{
 		manager.input(item->text().toStdString(), item, nowRow);
+		manager.checkError(nowRow);
 	}
 	manager.showGraph();
 }

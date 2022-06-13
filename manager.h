@@ -1,4 +1,4 @@
-#ifndef MANAGER_H
+﻿#ifndef MANAGER_H
 #define MANAGER_H
 #include <iostream>
 #include "storage.h"
@@ -24,6 +24,7 @@ public:
 	void removeGraph(int index);
 	double calculate(double x, int index);
 	void showGraph();
+	void checkError(int nowRow);  //檢查nowRow之後的錯誤
 };
 
 extern Manager manager;

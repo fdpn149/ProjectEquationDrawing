@@ -30,7 +30,8 @@ public:
     double y_max = 5;  //y坐標在顯示範圍最大值
     double o_x;  //xy坐標(0,0)的畫面x坐標
     double o_y;  //xy坐標(0,0)的畫面y坐標
-    vector<double> create_data(double start, double end, int segment_count, int index);
+    vector<double> calculateGraph(double first, double last, int count, int index);  //計算出函數對應的y，存到vector
+    double to_view_y(double value);  //轉換xy坐標成畫面坐標
     void moveScene(int x, int y);
     void zoomScene(QPointF point, double scale);
     deque<QGraphicsLineItem*> grid_h;  //水平格線
@@ -44,6 +45,8 @@ private:
     const int VIEW_HEIGHT;  //介面高度
     const int CENTER_X;  //中心的X坐標
     const int CENTER_Y;  //中心的Y坐標
+    const double PRECISION = 500; //描點準確度
+    const double INF = std::numeric_limits<double>::infinity();  //定義INF為double的無限大
 };
 
 #endif//GRAPHICSSCENE_H

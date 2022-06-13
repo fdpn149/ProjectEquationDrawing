@@ -50,7 +50,34 @@ void Manager::input(string input, QListWidgetItem* item, int nowRow)
 			viewer->removeGraph(nowRow);
 		clearQueue(storage.infix);
 	}
+}
 
+double Manager::calculate(double x, int index)
+{
+	int rindex = Storage::graphs.size() - index - 1;
+	try {
+		return parser.calculate(x, Storage::graphs.rbegin() + rindex, Storage::graphs.rend());
+	}
+	catch (divided_by_zero) {
+		throw;
+	}
+	catch (std::exception& e) {
+		string text = e.what();
+		if (text == "cannot find variable")
+		{
+			Storage::graphs.at(index)->status = -1;
+		}
+		throw;
+	}
+}
+
+void Manager::showGraph()
+{
+	viewer->showGraph();
+}
+
+void Manager::checkError(int nowRow)
+{
 	set<string> var_before;  //這一列之前/之後的變數集合
 	for (int i = 0; i <= nowRow; i++)
 	{
@@ -98,30 +125,6 @@ void Manager::input(string input, QListWidgetItem* item, int nowRow)
 				var_before.insert(Storage::graphs.at(i)->name);
 		}
 	}
-}
-
-double Manager::calculate(double x, int index)
-{
-	int rindex = Storage::graphs.size() - index - 1;
-	try {
-		return parser.calculate(x, Storage::graphs.rbegin() + rindex, Storage::graphs.rend());
-	}
-	catch (divided_by_zero) {
-		throw;
-	}
-	catch (std::exception& e) {
-		string text = e.what();
-		if (text == "cannot find variable")
-		{
-			Storage::graphs.at(index)->status = -1;
-		}
-		throw;
-	}
-}
-
-void Manager::showGraph()
-{
-	viewer->showGraph();
 }
 
 void Manager::start()
