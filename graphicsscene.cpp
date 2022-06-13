@@ -456,6 +456,13 @@ void GraphicsScene::moveScene(int x, int y)
 	manager.showGraph();
 }
 
+void GraphicsScene::zoomScene(QPointF point)
+{
+	const double zoom_x = point.x();
+	const double zoom_y = point.y();
+	moveScene(CENTER_X - zoom_x, CENTER_Y - zoom_y);
+}
+
 void GraphicsScene::draw()
 {
 	double inf = std::numeric_limits<double>::infinity();

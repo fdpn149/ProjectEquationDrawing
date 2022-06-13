@@ -30,6 +30,7 @@ public:
     double y_max = 5;  //y坐標在顯示範圍最大值
     vector<double> create_data(double start, double end, int segment_count, int index);
     void moveScene(int x, int y);
+    void zoomScene(QPointF point);
     deque<QGraphicsLineItem*> grid_h;  //水平格線
     deque<QGraphicsLineItem*> grid_v;  //垂直格線
     deque<QGraphicsTextItem*> text_x;  //x軸數字

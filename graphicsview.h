@@ -7,8 +7,6 @@
 
 class GraphicsView : public QGraphicsView
 {
-    
-
     QPoint lastPosition;
     bool isMoving = false;
 
