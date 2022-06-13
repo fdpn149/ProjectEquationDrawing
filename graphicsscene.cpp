@@ -76,41 +76,6 @@ GraphicsScene::~GraphicsScene()
 		delete q;
 }
 
-vector<double> GraphicsScene::create_data(double start, double end, int segment_count, int index)
-{
-	double delta = (end - start) / (double)segment_count;
-
-	vector<double> data;
-	double x = start;
-
-	int diByZero_count = 0;
-	for (size_t i = 0; i <= segment_count; ++i)
-	{
-		try {
-			data.push_back(manager.calculate(x, index));
-		}
-		catch (std::exception& e) {
-			string w = e.what();
-			if (w != "cannot find variable")
-			{
-				if (w.at(0) == '-')
-					data.push_back(-std::numeric_limits<double>::infinity());
-				else
-					data.push_back(std::numeric_limits<double>::infinity());
-			}
-		}
-		catch (divided_by_zero) {
-			diByZero_count++;
-			data.push_back(std::numeric_limits<double>::infinity());
-			if (diByZero_count > segment_count)
-				throw;
-		}
-		x += delta;
-	}
-
-	return data;
-}
-
 void GraphicsScene::moveScene(int x, int y)
 {
 	double new_x, new_y;
@@ -516,6 +481,41 @@ void GraphicsScene::zoomScene(QPointF point, double scale)
 				moveScene(0, -500);
 		moveScene(0, dy);
 	}
+}
+
+vector<double> GraphicsScene::create_data(double start, double end, int segment_count, int index)
+{
+	double delta = (end - start) / (double)segment_count;
+
+	vector<double> data;
+	double x = start;
+
+	int diByZero_count = 0;
+	for (size_t i = 0; i <= segment_count; ++i)
+	{
+		try {
+			data.push_back(manager.calculate(x, index));
+		}
+		catch (divided_by_zero) {
+			diByZero_count++;
+			data.push_back(std::numeric_limits<double>::infinity());
+			if (diByZero_count > segment_count)
+				throw;
+		}
+		catch (std::exception& e) {
+			string w = e.what();
+			if (w != "cannot find variable")
+			{
+				if (w.at(0) == '-')
+					data.push_back(-std::numeric_limits<double>::infinity());
+				else
+					data.push_back(std::numeric_limits<double>::infinity());
+			}
+		}
+		x += delta;
+	}
+
+	return data;
 }
 
 void GraphicsScene::draw()

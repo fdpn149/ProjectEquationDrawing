@@ -106,15 +106,15 @@ double Manager::calculate(double x, int index)
 	try {
 		return parser.calculate(x, Storage::graphs.rbegin() + rindex, Storage::graphs.rend());
 	}
+	catch (divided_by_zero) {
+		throw;
+	}
 	catch (std::exception& e) {
 		string text = e.what();
 		if (text == "cannot find variable")
 		{
 			Storage::graphs.at(index)->status = -1;
 		}
-		throw;
-	}
-	catch (divided_by_zero) {
 		throw;
 	}
 }
