@@ -120,10 +120,10 @@ void GraphicsScene::moveScene(int x, int y)
 	int range;
 
 	//調整xy的顯示範圍
-	x_min -= x * 10.0 / (double)VIEW_WIDTH;
-	x_max -= x * 10.0 / (double)VIEW_WIDTH;
-	y_min += y * 10.0 / (double)VIEW_HEIGHT;
-	y_max += y * 10.0 / (double)VIEW_HEIGHT;
+	x_min -= x * 10.0 / (double)VIEW_WIDTH * scaleValue;
+	x_max -= x * 10.0 / (double)VIEW_WIDTH * scaleValue;
+	y_min += y * 10.0 / (double)VIEW_HEIGHT * scaleValue;
+	y_max += y * 10.0 / (double)VIEW_HEIGHT * scaleValue;
 
 	o_x += x;
 	o_y += y;
@@ -467,7 +467,10 @@ void GraphicsScene::zoomScene(QPointF point, double scale)
 	const double zoom_x = point.x();
 	const double zoom_y = point.y();
 	scaleValue /= scale;
-
+	x_min /= scale;
+	x_max /= scale;
+	y_min /= scale;
+	y_max /= scale;
 	for (int i = 0; i < 10; i++)
 	{
 		text_x.at(i)->setPlainText(QString::number(text_x.at(i)->toPlainText().toDouble() / scale));
@@ -513,10 +516,6 @@ void GraphicsScene::zoomScene(QPointF point, double scale)
 				moveScene(0, -500);
 		moveScene(0, dy);
 	}
-	x_min /= scale;
-	x_max /= scale;
-	y_min /= scale;
-	y_max /= scale;
 }
 
 void GraphicsScene::draw()
