@@ -28,9 +28,11 @@ public:
     double x_max = 5;  //x坐標在顯示範圍的最大值
     double y_min = -5;  //y坐標在顯示範圍的最小值
     double y_max = 5;  //y坐標在顯示範圍最大值
+    double o_x;  //xy坐標(0,0)的畫面x坐標
+    double o_y;  //xy坐標(0,0)的畫面y坐標
     vector<double> create_data(double start, double end, int segment_count, int index);
     void moveScene(int x, int y);
-    void zoomScene(QPointF point);
+    void zoomScene(QPointF point, double scale);
     deque<QGraphicsLineItem*> grid_h;  //水平格線
     deque<QGraphicsLineItem*> grid_v;  //垂直格線
     deque<QGraphicsTextItem*> text_x;  //x軸數字
@@ -42,7 +44,6 @@ private:
     const int VIEW_HEIGHT;  //介面高度
     const int CENTER_X;  //中心的X坐標
     const int CENTER_Y;  //中心的Y坐標
-
 };
 
 #endif//GRAPHICSSCENE_H

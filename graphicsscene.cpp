@@ -4,6 +4,9 @@
 GraphicsScene::GraphicsScene(QObject* parent, int width, int height)
 	: QGraphicsScene(parent), VIEW_WIDTH(width), VIEW_HEIGHT(height), CENTER_X(width / 2.0), CENTER_Y(height / 2.0)
 {
+	o_x = CENTER_X;
+	o_y = CENTER_Y;
+
 	grid_h.resize(10);  //設定初始大小為10
 	grid_v.resize(10);  //設定初始大小為10
 	text_x.resize(10);  //設定初始大小為10
@@ -121,6 +124,9 @@ void GraphicsScene::moveScene(int x, int y)
 	x_max -= x * 10.0 / (double)VIEW_WIDTH;
 	y_min += y * 10.0 / (double)VIEW_HEIGHT;
 	y_max += y * 10.0 / (double)VIEW_HEIGHT;
+
+	o_x += x;
+	o_y += y;
 
 	//移動格線//
 	QGraphicsLineItem* nowItem;
@@ -456,17 +462,61 @@ void GraphicsScene::moveScene(int x, int y)
 	manager.showGraph();
 }
 
-void GraphicsScene::zoomScene(QPointF point)
+void GraphicsScene::zoomScene(QPointF point, double scale)
 {
 	const double zoom_x = point.x();
 	const double zoom_y = point.y();
-	scaleValue /= 2;
+	scaleValue /= scale;
+
 	for (int i = 0; i < 10; i++)
 	{
-		text_x.at(i)->setPlainText(QString::number(text_x.at(i)->toPlainText().toDouble() / 2));
-		text_y.at(i)->setPlainText(QString::number(text_y.at(i)->toPlainText().toDouble() / 2));
+		text_x.at(i)->setPlainText(QString::number(text_x.at(i)->toPlainText().toDouble() / scale));
+		text_y.at(i)->setPlainText(QString::number(text_y.at(i)->toPlainText().toDouble() / scale));
 	}
-	moveScene(CENTER_X - zoom_x, CENTER_Y - zoom_y);
+	if (scale > 1)
+	{
+		double dx = o_x - zoom_x;
+		if (dx > 0)
+			for (; dx > 500; dx -= 500)
+				moveScene(500, 0);
+		else
+			for (; dx < -500; dx += 500)
+				moveScene(-500, 0);
+		moveScene(dx, 0);
+
+		double dy = o_y - zoom_y;
+		if (dy > 0)
+			for (; dy > 500; dy -= 500)
+				moveScene(0, 500);
+		else
+			for (; dy < -500; dy += 500)
+				moveScene(0, -500);
+		moveScene(0, dy);
+	}
+	else
+	{
+		double dx = (zoom_x - o_x) / 2;
+		if (dx > 0)
+			for (; dx > 500; dx -= 500)
+				moveScene(500, 0);
+		else
+			for (; dx < -500; dx += 500)
+				moveScene(-500, 0);
+		moveScene(dx, 0);
+
+		double dy = (zoom_y - o_y) / 2;
+		if (dy > 0)
+			for (; dy > 500; dy -= 500)
+				moveScene(0, 500);
+		else
+			for (; dy < -500; dy += 500)
+				moveScene(0, -500);
+		moveScene(0, dy);
+	}
+	x_min /= scale;
+	x_max /= scale;
+	y_min /= scale;
+	y_max /= scale;
 }
 
 void GraphicsScene::draw()

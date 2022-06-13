@@ -60,6 +60,6 @@ void GraphicsView::wheelEvent(QWheelEvent* event)
     //system("cls");
     // std::cout << "viewPos=  " << view_pos.x() << "  " << view_pos.y() << std::endl;
 
-    scene->zoomScene(view_pos);
+    scene->zoomScene(view_pos, factor);
 
 }
