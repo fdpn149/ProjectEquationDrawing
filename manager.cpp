@@ -145,7 +145,7 @@ void Manager::editItem(QListWidgetItem* item, int nowRow)
 	viewer->editItem(item, Storage::graphs.at(nowRow)->color);
 }
 
-void Manager::removeItem(QListWidgetItem* item, int nowRow)
+void Manager::removeItem(int nowRow)
 {
 	string name = Storage::graphs.at(nowRow)->name;
 	if (name == "y")

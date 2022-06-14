@@ -20,7 +20,7 @@ public:
 	void input(string input, QListWidgetItem* item, int nowRow);
 	void addNewItem();
 	void editItem(QListWidgetItem* item, int nowRow);
-	void removeItem(QListWidgetItem* item, int nowRow);
+	void removeItem(int nowRow);
 	void removeGraph(int index);
 	double calculate(double x, int index);
 	void showGraph();

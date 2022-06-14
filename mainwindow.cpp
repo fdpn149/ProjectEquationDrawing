@@ -33,7 +33,7 @@ void MainWindow::on_listWidget_commitData()
 
 	if (item->text().isEmpty())
 	{
-		manager.removeItem(item, nowRow);
+		manager.removeItem(nowRow);
 		ui->listWidget->takeItem(nowRow);  //從列表中移除物品
 		manager.checkError(-1);
 	}

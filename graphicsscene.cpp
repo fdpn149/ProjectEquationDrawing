@@ -74,10 +74,6 @@ GraphicsScene::~GraphicsScene()
 
 void GraphicsScene::moveScene(int x, int y)
 {
-	double new_x, new_y;  //新的x,新的y
-
-	axisPen.setWidth(3);  //設定坐標軸之筆的寬度為3
-
 	//調整xy的顯示範圍
 	x_min -= x * 10.0 / (double)VIEW_WIDTH * scaleValue;
 	x_max -= x * 10.0 / (double)VIEW_WIDTH * scaleValue;
@@ -88,8 +84,6 @@ void GraphicsScene::moveScene(int x, int y)
 	o_y += y;  //xy原點的畫面y坐標移動
 
 	/*移動格線*/
-	QGraphicsLineItem* nowItem;  //儲存現在的線物件(LineItem)
-	int range;  //迴圈跑的範圍
 	//垂直移動
 	if (y < 0)  //滑鼠向上拖曳(可視範圍向下增加)
 		moveGridForward(grid_h, VIEW_HEIGHT, y_grid_min, y_grid_max, VIEW_WIDTH, 'y', y);
@@ -102,7 +96,6 @@ void GraphicsScene::moveScene(int x, int y)
 		moveGridBackward(grid_v, VIEW_WIDTH, x_grid_min, x_grid_max, VIEW_HEIGHT, 'x', x);
 
 	/*移動數字*/
-	QGraphicsTextItem* nowTextItem;
 	//垂直移動
 	if (y < 0)  //滑鼠向上拖曳(可視範圍向下增加)
 		moveNumberForward(text_y, VIEW_HEIGHT, x, y, -scaleValue, 'y');
