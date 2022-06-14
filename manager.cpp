@@ -75,7 +75,7 @@ void Manager::checkError(int nowRow)
 	for (int i = nowRow + 1; i < Storage::graphs.size(); i++)
 	{
 		bool error = false;
-		if (var_before.find(Storage::graphs.at(i)->name) != var_before.end())  //重複定義變數
+		if (Storage::graphs.at(i)->name == "" || var_before.find(Storage::graphs.at(i)->name) != var_before.end())  //重複定義變數
 		{
 			Storage::graphs.at(i)->clear();
 			error = true;

@@ -191,13 +191,10 @@ vector<double> GraphicsScene::calculateGraph(double first, double last, int coun
 		}
 		catch (std::exception& e) {
 			string w = e.what();
-			if (w != "cannot find variable")
-			{
-				if (w.at(0) == '-')
-					data.push_back(-std::numeric_limits<double>::infinity());
-				else
-					data.push_back(std::numeric_limits<double>::infinity());
-			}
+			if (w.at(0) == '-')
+				data.push_back(-std::numeric_limits<double>::infinity());
+			else
+				data.push_back(std::numeric_limits<double>::infinity());
 		}
 		x += dx;
 	}
