@@ -46,16 +46,16 @@ void Manager::input(string input, QListWidgetItem* item, int nowRow)
 	{
 		viewer->changeItemIcon(item, -1, Storage::graphs.at(nowRow)->color);
 		Storage::graphs.at(nowRow)->status = -1;
-		if (origin_name == "y")
+		if (origin_name == "y" || origin_name == "x")
 			viewer->removeGraph(nowRow);
 		clearQueue(storage.infix);
 	}
 }
 
-double Manager::calculate(double x, int index)
+double Manager::calculate(double num, char type, int index)
 {
 	int rindex = Storage::graphs.size() - index - 1;
-	return parser.calculate(x, Storage::graphs.rbegin() + rindex, Storage::graphs.rend());
+	return parser.calculate(num, type, Storage::graphs.rbegin() + rindex, Storage::graphs.rend());
 }
 
 void Manager::showGraph()
@@ -68,7 +68,7 @@ void Manager::checkError(int nowRow)
 	set<string> var_before;  //這一列之前/之後的變數集合
 	for (int i = 0; i <= nowRow; i++)
 	{
-		if (Storage::graphs.at(i)->name != "y" && Storage::graphs.at(i)->status == 1)
+		if (Storage::graphs.at(i)->name != "y" && Storage::graphs.at(i)->name != "x" && Storage::graphs.at(i)->status == 1)
 			var_before.insert(Storage::graphs.at(i)->name);
 	}
 
@@ -84,7 +84,7 @@ void Manager::checkError(int nowRow)
 		{
 			for (string s : Storage::graphs.at(i)->postfix)
 			{
-				if (isalpha(s.at(0)) && s != "sin" && s != "cos" && s != "x")
+				if (isalpha(s.at(0)) && s != "sin" && s != "cos" && s != "x" && s != "y")
 				{
 					if (var_before.find(s) == var_before.end())
 					{
@@ -98,7 +98,7 @@ void Manager::checkError(int nowRow)
 		{
 			viewer->changeItemIcon(i, -1, Storage::graphs.at(i)->color);
 			Storage::graphs.at(i)->status = -1;
-			if (Storage::graphs.at(i)->name == "y")
+			if (Storage::graphs.at(i)->name == "y" || Storage::graphs.at(i)->name == "x")
 			{
 				viewer->removeGraph(i);
 				Storage::graphs.at(i)->graph = nullptr;
@@ -108,7 +108,7 @@ void Manager::checkError(int nowRow)
 		{
 			viewer->changeItemIcon(i, 0, Storage::graphs.at(i)->color);
 			Storage::graphs.at(i)->status = 1;
-			if (Storage::graphs.at(i)->name != "y")
+			if (Storage::graphs.at(i)->name != "y" && Storage::graphs.at(i)->name != "x")
 				var_before.insert(Storage::graphs.at(i)->name);
 		}
 	}
@@ -148,7 +148,7 @@ void Manager::editItem(QListWidgetItem* item, int nowRow)
 void Manager::removeItem(int nowRow)
 {
 	string name = Storage::graphs.at(nowRow)->name;
-	if (name == "y")
+	if (name == "y" || name == "x")
 		viewer->removeGraph(nowRow);
 	Storage::graphs.erase(Storage::graphs.begin() + nowRow);
 }

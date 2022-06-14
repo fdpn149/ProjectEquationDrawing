@@ -171,37 +171,6 @@ void GraphicsScene::zoomScene(QPointF point, double scale)
 	}
 }
 
-vector<double> GraphicsScene::calculateGraph(double first, double last, int count, int index)
-{
-	vector<double> data;  //存函數數值
-	double dx = (last - first) / (double)count;  //x的間距
-	int diByZero_count = 0;  //除以零的次數
-	double x = first;  //先將x設為第1項
-
-	for (int i = 0; i <= count; i++)
-	{
-		try {
-			data.push_back(manager.calculate(x, index));  //計算函數值
-		}
-		catch (divided_by_zero) {  //若發生除以0
-			diByZero_count++;
-			data.push_back(std::numeric_limits<double>::infinity());
-			if (diByZero_count > count)  //如果函數的每一項都是除以0
-				throw;
-		}
-		catch (std::exception& e) {
-			string w = e.what();
-			if (w.at(0) == '-')
-				data.push_back(-std::numeric_limits<double>::infinity());
-			else
-				data.push_back(std::numeric_limits<double>::infinity());
-		}
-		x += dx;
-	}
-
-	return data;
-}
-
 void GraphicsScene::moveGridForward(deque<QGraphicsLineItem*>& grid, const int& view_max, int& grid_min, int& grid_max, const int& line_end, char type, int distance)
 {
 	int range;  //迴圈跑的範圍
@@ -454,7 +423,48 @@ double GraphicsScene::to_view_y(double value)
 {
 	if (value == INF || value == -INF)  //若數值為正負無限大
 		return value;  //直接回傳
-	return (y_max - value) * 521 / (y_max - y_min);  //回傳轉換後的數值
+	return (y_max - value) * VIEW_HEIGHT / (y_max - y_min);  //回傳轉換後的數值
+}
+
+double GraphicsScene::to_view_x(double value)
+{
+	if (value == INF || value == -INF)  //若數值為正負無限大
+		return value;  //直接回傳
+	return (value - x_min) * VIEW_WIDTH / (x_max - x_min);  //回傳轉換後的數值
+}
+
+vector<double> GraphicsScene::calculateGraph(double first, double last, int count, int index, char type)
+{
+	vector<double> data;  //存函數數值
+	double dxy = (last - first) / (double)count;  //x或的間距
+	int diByZero_count = 0;  //除以零的次數
+	double xy = first;  //先將xy設為第1項
+
+	for (int i = 0; i <= count; i++)
+	{
+		try {
+			data.push_back(manager.calculate(xy, type, index));  //計算函數值
+		}
+		catch (divided_by_zero) {  //若發生除以0
+			diByZero_count++;
+			data.push_back(std::numeric_limits<double>::infinity());
+			if (diByZero_count > count)  //如果函數的每一項都是除以0
+				throw;
+		}
+		catch (variable_error) {
+			throw;
+		}
+		catch (std::exception& e) {
+			string w = e.what();
+			if (w.at(0) == '-')
+				data.push_back(-std::numeric_limits<double>::infinity());
+			else
+				data.push_back(std::numeric_limits<double>::infinity());
+		}
+		xy += dxy;
+	}
+
+	return data;
 }
 
 void GraphicsScene::draw()
@@ -463,7 +473,7 @@ void GraphicsScene::draw()
 	{
 		try {
 			//若找到y=的項，而且狀態為顯示
-			if (Storage::graphs.at(i)->status == 1 && Storage::graphs.at(i)->name == "y")
+			if (Storage::graphs.at(i)->status == 1 && (Storage::graphs.at(i)->name == "y" || Storage::graphs.at(i)->name == "x"))
 			{
 				vector<double> data;  //儲存函數值
 				double precision;  //x的精確度(間距)
@@ -473,55 +483,106 @@ void GraphicsScene::draw()
 				else  //若縮放倍率不大於1
 					precision = PRECISION;  //精確度設為預設倍率
 
-				data = calculateGraph(x_min, x_max, precision, i);  //計算y的值，存入data
-
-				double dx = (double)VIEW_WIDTH / precision;  //x在畫面的間距
-
 				QPainterPath path;  //儲存函數路徑
 
-				double x = 0;  //畫面坐標x初始設為0
-				double y = to_view_y(data.at(0));  //畫面坐標y初始設為第0項的畫面坐標
-				const double y_display_max = 2000;  //y能顯示的最大值
-				const double y_display_min = -2000;  //y能顯示的最小值
-
-				bool need_move = false;  //是否需要移動
-				double last_data;  //上一個y
-				if (y != INF && y != -INF && y <= y_display_max && y >= y_display_min)  //若y不為正負無限大
+				if (Storage::graphs.at(i)->name == "y")
 				{
-					path.moveTo(x, y);  //移動到(x,y)
-					last_data = data.at(0);
-				}
-				else
-					need_move = true;  //因為尚未移動，故將need_move設為true
+					data = calculateGraph(x_min, x_max, precision, i, 'y');  //計算y的值，存入data
 
-				for (int i = 1; i <= precision; i++)
-				{
-					x += dx;
-					y = to_view_y(data.at(i));
+					double dx = (double)VIEW_WIDTH / precision;  //x在畫面的間距
 
-					if (need_move)
+					double x = 0;  //畫面坐標x初始設為0
+					double y = to_view_y(data.at(0));  //畫面坐標y初始設為第0項的畫面坐標
+					const double y_display_max = 2000;  //y能顯示的最大值
+					const double y_display_min = -2000;  //y能顯示的最小值
+
+					bool need_move = false;  //是否需要移動
+					double last_data;  //上一個y
+					if (y != INF && y != -INF && y <= y_display_max && y >= y_display_min)  //若y不為正負無限大
 					{
-						if (y != INF && y != -INF && y <= y_display_max && y >= y_display_min)
-						{
-							path.moveTo(x, y);
-							need_move = false;
-							last_data = data.at(i);
-						}
+						path.moveTo(x, y);  //移動到(x,y)
+						last_data = data.at(0);
 					}
 					else
+						need_move = true;  //因為尚未移動，故將need_move設為true
+
+					for (int i = 1; i <= precision; i++)
 					{
-						if (y == INF || y == -INF || y > y_display_max || y < y_display_min)
+						x += dx;
+						y = to_view_y(data.at(i));
+
+						if (need_move)
 						{
-							need_move = true;
+							if (y != INF && y != -INF && y <= y_display_max && y >= y_display_min)
+							{
+								path.moveTo(x, y);
+								need_move = false;
+								last_data = data.at(i);
+							}
 						}
 						else
 						{
-							path.lineTo(x, y);
-							last_data = data.at(i);
+							if (y == INF || y == -INF || y > y_display_max || y < y_display_min)
+							{
+								need_move = true;
+							}
+							else
+							{
+								path.lineTo(x, y);
+								last_data = data.at(i);
+							}
 						}
 					}
 				}
+				else
+				{
+					data = calculateGraph(y_min, y_max, precision, i, 'x');  //計算y的值，存入data
 
+					double dy = -(double)VIEW_HEIGHT / precision;  //x在畫面的間距
+
+					double x = to_view_x(data.at(0));  //畫面坐標x初始設為0
+					double y = VIEW_HEIGHT;  //畫面坐標y初始設為第0項的畫面坐標
+					const double x_display_max = 2000;  //y能顯示的最大值
+					const double x_display_min = -2000;  //y能顯示的最小值
+
+					bool need_move = false;  //是否需要移動
+					double last_data;  //上一個y
+					if (x != INF && x != -INF && x <= x_display_max && x >= x_display_min)  //若y不為正負無限大
+					{
+						path.moveTo(x, y);  //移動到(x,y)
+						last_data = data.at(0);
+					}
+					else
+						need_move = true;  //因為尚未移動，故將need_move設為true
+
+					for (int i = 1; i <= precision; i++)
+					{
+						y += dy;
+						x = to_view_x(data.at(i));
+
+						if (need_move)
+						{
+							if (x != INF && x != -INF && x <= x_display_max && x >= x_display_min)
+							{
+								path.moveTo(x, y);
+								need_move = false;
+								last_data = data.at(i);
+							}
+						}
+						else
+						{
+							if (x == INF || x == -INF || x > x_display_max || x < x_display_min)
+							{
+								need_move = true;
+							}
+							else
+							{
+								path.lineTo(x, y);
+								last_data = data.at(i);
+							}
+						}
+					}
+				}
 				QGraphicsPathItem* pathItem;
 				if (Storage::graphs.at(i)->graph != nullptr)
 				{
@@ -541,6 +602,9 @@ void GraphicsScene::draw()
 			}
 		}
 		catch (divided_by_zero) {
+			manager.removeGraph(i);
+		}
+		catch (variable_error) {
 			manager.removeGraph(i);
 		}
 	}

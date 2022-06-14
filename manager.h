@@ -22,7 +22,7 @@ public:
 	void editItem(QListWidgetItem* item, int nowRow);
 	void removeItem(int nowRow);
 	void removeGraph(int index);
-	double calculate(double x, int index);
+	double calculate(double num, char type, int index);
 	void showGraph();
 	void checkError(int nowRow);  //檢查nowRow之後的錯誤
 };

@@ -68,11 +68,11 @@ string Parser::getVarName(string input)
 
 string Parser::parseInput(string input, Storage& storage, int nowRow)
 {
-	string v1 = getVarName(input);  //將v1設為等號前的變數名稱
+	string var = getVarName(input);  //將var設為等號前的變數名稱
 	int eq_pos = input.find("=");  //等號的位置
 
-	if (v1 != "y" && findVariable(Storage::graphs.rbegin() + Storage::graphs.size() - nowRow - 1,
-		Storage::graphs.rend(), v1) != Storage::graphs.rend()) return "";  //變數重複定義
+	if (var != "y" && var != "x" && findVariable(Storage::graphs.rbegin() + Storage::graphs.size() - nowRow - 1,
+		Storage::graphs.rend(), var) != Storage::graphs.rend()) return "";  //變數重複定義
 
 	int par_count = 0;  //計算上下括號數
 	int next_code = 123;  //下一個有效字元的代碼 #初始為(-0axs
@@ -164,14 +164,14 @@ string Parser::parseInput(string input, Storage& storage, int nowRow)
 			string name = input.substr(from, i - from);  //截取變數名稱
 			i--;
 
-			if (name == "y")
+			if ((var == "y" && name == "y") || (var == "x" && name == "x"))  //若等號前與等號後都為x或y
 				return "";
 
 			auto variable_it = findVariable(Storage::graphs.rbegin() + Storage::graphs.size() - nowRow - 1,
 				Storage::graphs.rend(), name);
 
 			//若變數與等號前的變數相同 或 找不到變數
-			if (name == v1 || (name != "x" && variable_it == Storage::graphs.rend()))
+			if (name == var || (name != "x" && name != "y" && variable_it == Storage::graphs.rend()))
 				return "";
 
 			if (variable_it != Storage::graphs.rend() && (*variable_it)->status == -1) return "";
@@ -214,7 +214,7 @@ string Parser::parseInput(string input, Storage& storage, int nowRow)
 		return "";
 
 
-	return v1;
+	return var;
 }
 
 int Parser::getWeight(string symbol)
@@ -286,7 +286,7 @@ void Parser::toPostfix(queue<string> infix, vector<string>& postfix)
 
 }
 
-double Parser::calculate(double x, vector<Graph*>::reverse_iterator rbegin, vector<Graph*>::reverse_iterator rend)
+double Parser::calculate(double num, char type, vector<Graph*>::reverse_iterator rbegin, vector<Graph*>::reverse_iterator rend)
 {
 	vector<string> postfix = (*rbegin)->postfix;
 
@@ -295,16 +295,18 @@ double Parser::calculate(double x, vector<Graph*>::reverse_iterator rbegin, vect
 		string& now = postfix.at(i);
 		if (!isOperator(now))  //若不是運算符號
 		{
-			if (now == "x")
-				now = to_string(x);
+			if ((type == 'y' && now == "x") || (type == 'x' && now == "y"))
+				now = to_string(num);
 			else if (!isdigit(now.at(0)))  //判斷是否是變數
 			{
 				auto rit = findVariable(rbegin, Storage::graphs.rend(), now);
-				if (rit != Storage::graphs.rend())
+				if (now != "x" && now != "y" && rit != Storage::graphs.rend())
 				{
-					double num = calculate(x, rit, rend);  //先計算變數的數值
-					now = to_string(num);  //將該項取代成數值
+					double n = calculate(num, type, rit, rend);  //先計算變數的數值
+					now = to_string(n);  //將該項取代成數值
 				}
+				else
+					throw variable_error();
 			}
 		}
 		else  //是運算符號

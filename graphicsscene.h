@@ -39,7 +39,8 @@ public:
 	void removeGraph(int index);	//刪除函數圖形
 	void draw();					//繪製函數圖形
 	double to_view_y(double value);	//轉換xy坐標成畫面坐標
-	vector<double> calculateGraph(double first, double last, int count, int index);	//計算出函數對應的y，存到vector
+	double to_view_x(double value);	//轉換xy坐標成畫面坐標
+	vector<double> calculateGraph(double first, double last, int count, int index, char type);	//計算出函數對應的x或y，存到vector
 private:
 	const int VIEW_WIDTH;	//介面寬度
 	const int VIEW_HEIGHT;	//介面高度

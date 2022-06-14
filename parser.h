@@ -17,7 +17,7 @@ public:
 	string parseInput(string input, Storage& storage, int nowRow);  //輸入處理
 	int getWeight(string symbol);  //得到符號的優先值
 	void toPostfix(queue<string> infix, vector<string>& postfix);  //轉成後序式
-	double calculate(double x, vector<Graph*>::reverse_iterator rbegin, vector<Graph*>::reverse_iterator rend);  //計算數值
+	double calculate(double num, char type, vector<Graph*>::reverse_iterator rbegin, vector<Graph*>::reverse_iterator rend);  //計算數值
 
 	template<class T>
 	T findVariable(T begin, T end, string name);  //尋找變數的位置
@@ -35,6 +35,7 @@ public:
 };
 
 class divided_by_zero{};
+class variable_error{};
 
 #endif // PARSER_H
 
