@@ -288,8 +288,6 @@ void Parser::toPostfix(queue<string> infix, vector<string>& postfix)
 
 double Parser::calculate(double x, vector<Graph*>::reverse_iterator rbegin, vector<Graph*>::reverse_iterator rend)
 {
-	if ((*rbegin)->status == -1) throw calculate_error("cannot find variable");
-
 	vector<string> postfix = (*rbegin)->postfix;
 
 	for (int i = 0; i < postfix.size(); i++)

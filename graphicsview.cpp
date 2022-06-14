@@ -1,4 +1,4 @@
-#include "graphicsview.h"
+﻿#include "graphicsview.h"
 #include <iostream>
 #include <cstdlib>
 
@@ -37,10 +37,6 @@ void GraphicsView::mouseMoveEvent(QMouseEvent* event)
         const int deltaX = event->position().x() - lastPosition.x();
         const int deltaY = event->position().y() - lastPosition.y();
 
-        //system("cls");
-        //std::cout << deltaX << std::endl << deltaY << std::endl;
-        //std::cout << deltaX-lastDeltaX << std::endl << deltaY-lastDeltaY << std::endl;
-
         scene->moveScene(deltaX-lastDeltaX, deltaY-lastDeltaY);
 
         lastDeltaX = deltaX;
@@ -50,12 +46,14 @@ void GraphicsView::mouseMoveEvent(QMouseEvent* event)
 
 void GraphicsView::wheelEvent(QWheelEvent* event)
 {
-    double factor = 2;
-    if (event->angleDelta().y() < 0)
+    double factor;  //縮放因數
+    if (event->angleDelta().y() < 0)  //縮小
         factor = 0.5;
+    else  //放大
+        factor = 2;
 
-    QPointF view_pos = event->position();
+    QPointF now_pos = event->position();  //現在滑鼠在畫面上的位置
 
-    scene->zoomScene(view_pos, factor);
+    scene->zoomScene(now_pos, factor);  //縮放畫面
 
 }
