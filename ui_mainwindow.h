@@ -27,7 +27,6 @@ public:
     QWidget *centralwidget;
     QListWidget *listWidget;
     QPushButton *addButton;
-    QPushButton *pushButton;
     GraphicsView *graphicsView;
     QMenuBar *menubar;
     QStatusBar *statusbar;
@@ -46,10 +45,7 @@ public:
         listWidget->setSelectionMode(QAbstractItemView::NoSelection);
         addButton = new QPushButton(centralwidget);
         addButton->setObjectName(QString::fromUtf8("addButton"));
-        addButton->setGeometry(QRect(600, 510, 93, 29));
-        pushButton = new QPushButton(centralwidget);
-        pushButton->setObjectName(QString::fromUtf8("pushButton"));
-        pushButton->setGeometry(QRect(710, 510, 75, 24));
+        addButton->setGeometry(QRect(600, 500, 201, 29));
         graphicsView = new GraphicsView(centralwidget);
         graphicsView->setObjectName(QString::fromUtf8("graphicsView"));
         graphicsView->setGeometry(QRect(30, 20, 520, 520));
@@ -58,7 +54,7 @@ public:
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName(QString::fromUtf8("menubar"));
-        menubar->setGeometry(QRect(0, 0, 860, 25));
+        menubar->setGeometry(QRect(0, 0, 860, 22));
         MainWindow->setMenuBar(menubar);
         statusbar = new QStatusBar(MainWindow);
         statusbar->setObjectName(QString::fromUtf8("statusbar"));
@@ -73,7 +69,6 @@ public:
     {
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MainWindow", nullptr));
         addButton->setText(QCoreApplication::translate("MainWindow", "Add", nullptr));
-        pushButton->setText(QCoreApplication::translate("MainWindow", "PushButton", nullptr));
     } // retranslateUi
 
 };
