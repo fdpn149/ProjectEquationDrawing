@@ -272,7 +272,7 @@ void GraphicsScene::moveNumberForward(deque<QGraphicsTextItem*>& text, const int
 	QGraphicsTextItem* nowTextItem;  //儲存現在的文字物件
 	for (int i = 0; i < range; i++)
 	{
-		nowTextItem = text.at(i);  //現在物件設為第i個水平線物件
+		nowTextItem = text.at(i);  //現在物件設為第i個文字物件
 		new_x = nowTextItem->pos().x() + x;  //設定新的x為移動後的x
 		new_y = nowTextItem->pos().y() + y;  //設定新的y為移動後的y
 		if ((type == 'x' && new_x < 0) || (type == 'y' && new_y < 0))  //若新的坐標小於0
@@ -282,41 +282,41 @@ void GraphicsScene::moveNumberForward(deque<QGraphicsTextItem*>& text, const int
 			text.pop_front();  //將text的第0項刪掉
 			i--;  //i減1(因為grid的順序改變，所以i要減1與i++抵消)
 			range--;  //迴圈執行範圍縮減(因為text的順序有改變，執行到原來的range會重複執行到)
-			nowTextItem->setPos(new_x, new_y);
-			nowTextItem->setPlainText(QString::number(text.at(text.size() - 1)->toPlainText().toDouble() + delta));
-			text.push_back(nowTextItem);
+			nowTextItem->setPos(new_x, new_y);  //設定文字的位置
+			nowTextItem->setPlainText(QString::number(text.at(text.size() - 1)->toPlainText().toDouble() + delta));  //設定文字為移動過的數字
+			text.push_back(nowTextItem);  //將修改後的文字物件放到最後一項
 		}
 		else
 		{
-			nowTextItem->setPos(new_x, new_y);
+			nowTextItem->setPos(new_x, new_y);  //設定文字的位置
 		}
 	}
 }
 
 void GraphicsScene::moveNumberBackward(deque<QGraphicsTextItem*>& text, const int& view_max, int x, int y, double delta, char type)
 {
-	int range = 0;
+	int range = 0;  //設定迴圈範圍的初始值為0
 	double new_x, new_y;  //新的x,新的y
-	QGraphicsTextItem* nowTextItem;
+	QGraphicsTextItem* nowTextItem;  //儲存現在的文字物件
 	for (int i = 9; i >= range; i--)
 	{
-		nowTextItem = text.at(i);
-		new_x = nowTextItem->pos().x() + x;
-		new_y = nowTextItem->pos().y() + y;
-		if ((type == 'x' && new_x > view_max) || (type == 'y' && new_y > view_max))
+		nowTextItem = text.at(i);  //現在物件設為第i個文字物件
+		new_x = nowTextItem->pos().x() + x;  //設定新的x為移動後的x
+		new_y = nowTextItem->pos().y() + y;  //設定新的y為移動後的y
+		if ((type == 'x' && new_x > view_max) || (type == 'y' && new_y > view_max))  //若新的坐標大於顯示範圍最大值
 		{
-			if (type == 'x')	new_x = new_x - view_max;
-			else				new_y = new_y - view_max;
-			text.pop_back();
-			i++;
-			range++;
-			nowTextItem->setPos(new_x, new_y);
-			nowTextItem->setPlainText(QString::number(text.at(0)->toPlainText().toDouble() + delta));
-			text.push_front(nowTextItem);
+			if (type == 'x')	new_x = new_x - view_max;  //移到畫面另一側，並減掉多出去的部分
+			else				new_y = new_y - view_max;  //移到畫面另一側，並減掉多出去的部分
+			text.pop_back();  //將text的最後一項刪掉
+			i++;  //i減1(因為text的順序改變，所以i要加1與i--抵消)
+			range++;  //迴圈執行範圍縮減(因為text的順序有改變，執行到原來的range會少執行到)
+			nowTextItem->setPos(new_x, new_y);  //設定文字的位置
+			nowTextItem->setPlainText(QString::number(text.at(0)->toPlainText().toDouble() + delta));  //設定文字為移動過的數字
+			text.push_front(nowTextItem);  //將修改後的文字物件放到最後一項
 		}
 		else
 		{
-			nowTextItem->setPos(new_x, new_y);
+			nowTextItem->setPos(new_x, new_y);  //設定文字的位置
 		}
 	}
 }
@@ -326,29 +326,29 @@ void GraphicsScene::keepNumber()
 	QGraphicsTextItem* nowTextItem;
 	double new_x, new_y;  //新的x,新的y
 	//y軸數字判斷
-	if (x_grid_max + x_grid_min > 9)
+	if (x_grid_max + x_grid_min > 9)  //若y軸超出畫面左邊
 	{
 		new_x = 0;
 		for (int i = 0; i < 10; i++)
 		{
 			nowTextItem = text_y.at(i);
-			nowTextItem->setPos(new_x, nowTextItem->pos().y());
+			nowTextItem->setPos(new_x, nowTextItem->pos().y());  //將y軸數字貼在畫面左邊
 		}
 	}
-	else if (x_grid_max + x_grid_min < -9)
+	else if (x_grid_max + x_grid_min < -9)  //若y軸超出畫面右邊
 	{
 		for (int i = 0; i < 10; i++)
 		{
 			nowTextItem = text_y.at(i);
-			new_x = VIEW_WIDTH - nowTextItem->boundingRect().width();
-			nowTextItem->setPos(new_x, nowTextItem->pos().y());
+			new_x = VIEW_WIDTH - nowTextItem->boundingRect().width();  //x設為畫面寬度減掉文字寬度(靠右對齊)
+			nowTextItem->setPos(new_x, nowTextItem->pos().y());  //將y軸數字貼在畫面右邊
 		}
 	}
-	else
+	else  //y軸沒超出畫面
 	{
 		for (int i = 0; i < 10; i++)
 		{
-			if (grid_v.at(i)->pen() == axisPen)
+			if (grid_v.at(i)->pen() == axisPen)  //找出y軸的位置
 			{
 				new_x = grid_v.at(i)->line().x1();
 				break;
@@ -357,32 +357,32 @@ void GraphicsScene::keepNumber()
 		for (int i = 0; i < 10; i++)
 		{
 			nowTextItem = text_y.at(i);
-			nowTextItem->setPos(new_x, nowTextItem->pos().y());
+			nowTextItem->setPos(new_x, nowTextItem->pos().y());  //將y軸數字設在坐標軸邊
 		}
 	}
 
 	//x軸數字判斷
-	if (y_grid_max + y_grid_min < -9)
+	if (y_grid_max + y_grid_min < -9)  //若x軸超出畫面上面
 	{
 		new_y = 0;
 		for (int i = 0; i < 10; i++)
 		{
 			nowTextItem = text_x.at(i);
-			nowTextItem->setPos(nowTextItem->pos().x(), new_y);
+			nowTextItem->setPos(nowTextItem->pos().x(), new_y);  //將x軸數字貼在畫面上面
 		}
 	}
-	else if (y_grid_max + y_grid_min > 9)
+	else if (y_grid_max + y_grid_min > 9)  //若x軸超出畫面下面
 	{
 		new_y = VIEW_HEIGHT - text_x.at(0)->boundingRect().height();
 		for (int i = 0; i < 10; i++)
 		{
 			nowTextItem = text_x.at(i);
-			nowTextItem->setPos(nowTextItem->pos().x(), new_y);
+			nowTextItem->setPos(nowTextItem->pos().x(), new_y);  //將x軸數字貼在畫面下面
 		}
 	}
 	else
 	{
-		for (int i = 0; i < 10; i++)
+		for (int i = 0; i < 10; i++)  //找出x軸的位置
 			if (grid_h.at(i)->pen() == axisPen)
 			{
 				new_y = grid_h.at(i)->line().y1();
@@ -391,7 +391,7 @@ void GraphicsScene::keepNumber()
 		for (int i = 0; i < 10; i++)
 		{
 			nowTextItem = text_x.at(i);
-			nowTextItem->setPos(nowTextItem->pos().x(), new_y);
+			nowTextItem->setPos(nowTextItem->pos().x(), new_y);  //將x軸數字設在坐標軸邊
 		}
 	}
 }
