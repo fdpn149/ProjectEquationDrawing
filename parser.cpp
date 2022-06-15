@@ -75,7 +75,7 @@ string Parser::parseInput(string input, Storage& storage, int nowRow)
 		Storage::graphs.rend(), var) != Storage::graphs.rend()) return "";  //變數重複定義
 
 	int par_count = 0;  //計算上下括號數
-	int next_code = 123;  //下一個有效字元的代碼 #初始為(-0axs
+	int next_code = 59;  //下一個有效字元的代碼 #初始為(-0sa
 	int now_code = 0;
 
 	for (int i = eq_pos + 1; i < input.size(); i++)
@@ -85,7 +85,7 @@ string Parser::parseInput(string input, Storage& storage, int nowRow)
 		{
 			par_count++;
 			now_code = 1;
-			next_code = 123;
+			next_code = 59;  //(-0sa
 			storage.infix.push("(");
 			continue;
 		}
@@ -97,7 +97,7 @@ string Parser::parseInput(string input, Storage& storage, int nowRow)
 			else
 				storage.infix.push("-");  //減號
 			now_code = 2;
-			next_code = 121;
+			next_code = 57;  //(0sa
 			continue;
 		}
 		//加乘除冪
@@ -105,14 +105,14 @@ string Parser::parseInput(string input, Storage& storage, int nowRow)
 			|| input.at(i) == '/' || input.at(i) == '^'))
 		{
 			now_code = 4;
-			next_code = 121;
+			next_code = 57;  //(0sa
 			storage.infix.push(string(1, input.at(i)));
 			continue;
 		}
 		//數字
 		if ((next_code & 8) >= 1 && std::isdigit(input.at(i)))
 		{
-			int from = i;
+			int from = i;  //數字的第0個字
 
 			bool flag = false;
 			//將i移到不是數字的地方
@@ -124,11 +124,11 @@ string Parser::parseInput(string input, Storage& storage, int nowRow)
 					return "";
 				i++;
 			}
-			if (i - 1 >= 0 && input.at(i - 1) == '.')
-				return "";
+			if (i - 1 >= 0 && input.at(i - 1) == '.')  //若數字的最後一個字是點
+				return "";  //輸入有誤
 
 			now_code = 8;
-			next_code = 398;
+			next_code = 78;  //-+0)
 
 			string str = input.substr(from, i - from);  //截取
 			i--;
@@ -136,8 +136,8 @@ string Parser::parseInput(string input, Storage& storage, int nowRow)
 			storage.infix.push(str);
 			continue;
 		}
-		//英文(sin/cos=16, 其它=64)
-		if ((next_code & 112) >= 1 && std::isalpha(input.at(i)))
+		//英文(sin/cos=16, 其它=32)
+		if ((next_code & 48) >= 1 && std::isalpha(input.at(i)))
 		{
 			//sin/cos判斷
 			if (input.substr(i, 3) == "sin" || input.substr(i, 3) == "cos")
@@ -147,10 +147,10 @@ string Parser::parseInput(string input, Storage& storage, int nowRow)
 					storage.infix.push(input.substr(i, 3));
 					i += 2;
 					now_code = 16;
-					next_code = 1;
+					next_code = 1;  //(
 					continue;
 				}
-				else if (i + 3 < input.length() && !std::isalpha(input.at(i + 3)) && !std::isdigit(input.at(i + 3)))  //若下個字不為英文或數字(不是變數)
+				else if (i + 3 < input.length() && !std::isalnum(input.at(i + 3)))  //若下個字不為英文或數字(不是變數)
 				{
 					return "";
 				}
@@ -177,27 +177,19 @@ string Parser::parseInput(string input, Storage& storage, int nowRow)
 			if (variable_it != Storage::graphs.rend() && (*variable_it)->status == -1) return "";
 
 			storage.infix.push(name);
-			now_code = 64;
-			next_code = 262;
-			continue;
-		}
-		//小數點
-		if ((next_code & 128) >= 1 && input.at(i) == '.')
-		{
-			now_code = 128;
-			next_code = 8;
-			storage.infix.push(".");
+			now_code = 32;
+			next_code = 70;  //-+)
 			continue;
 		}
 		//右括號
-		if ((next_code & 256) >= 1 && input.at(i) == ')')
+		if ((next_code & 64) >= 1 && input.at(i) == ')')
 		{
 			par_count--;
 
 			if (par_count < 0) return "";  //判斷是否多括
 
-			now_code = 256;
-			next_code = 262;
+			now_code = 64;
+			next_code = 70;  //-+)
 			storage.infix.push(")");
 			continue;
 		}
@@ -210,7 +202,7 @@ string Parser::parseInput(string input, Storage& storage, int nowRow)
 
 
 
-	if ((now_code & 488) == 0)
+	if ((now_code & 104) == 0)
 		return "";
 
 
