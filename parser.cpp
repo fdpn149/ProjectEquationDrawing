@@ -6,7 +6,7 @@ using std::to_string;
 
 bool Parser::isVarNum(string str)
 {
-	if (str == "sin" || str == "cos")
+	if (str == "sin" || str == "cos" || str == "tan")
 		return false;
 	if (isalpha(str.at(0)))  //如果是變數
 		return true;
@@ -30,7 +30,7 @@ bool Parser::isOperator(string str)
 {
 	if (!isalnum(str.at(0)))  //若不是英數
 		return true;
-	if (str == "sin" || str == "cos")  //若是sin/cos
+	if (str == "sin" || str == "cos" || str == "tan")  //若是sin/cos/tan
 		return true;
 
 	return false;
@@ -61,7 +61,7 @@ string Parser::getVarName(string input)
 				return "";
 		}
 	}
-	if (v1.empty() || v1 == "sin" || v1 == "cos") return "";  //若v1為空字串或sin/cos
+	if (v1.empty() || v1 == "sin" || v1 == "cos" || v1 == "tan") return "";  //若v1為空字串或sin/cos
 
 	return v1;
 }
@@ -140,7 +140,7 @@ string Parser::parseInput(string input, Storage& storage, int nowRow)
 		if ((next_code & 48) >= 1 && std::isalpha(input.at(i)))
 		{
 			//sin/cos判斷
-			if (input.substr(i, 3) == "sin" || input.substr(i, 3) == "cos")
+			if (input.substr(i, 3) == "sin" || input.substr(i, 3) == "cos" || input.substr(i, 3) == "tan")
 			{
 				if ((next_code & 16) >= 1 && i + 3 < input.length() && input.at(i + 3) == '(')  //若sin/cos的下個字為(
 				{
@@ -211,7 +211,7 @@ string Parser::parseInput(string input, Storage& storage, int nowRow)
 
 int Parser::getWeight(string symbol)
 {
-	if (symbol == "sin" || symbol == "cos")
+	if (symbol == "sin" || symbol == "cos" || symbol == "tan")
 		return 4;
 	if (symbol == "^")
 		return 3;
@@ -313,6 +313,8 @@ double Parser::calculate(double num, char type, vector<Graph*>::reverse_iterator
 					now = to_string(std::sin(pre1));
 				else if (now == "cos")
 					now = to_string(std::cos(pre1));
+				else if (now == "tan")
+					now = to_string(std::tan(pre1));
 				else
 					now = to_string(-pre1);
 				i--;

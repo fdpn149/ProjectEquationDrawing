@@ -40,7 +40,7 @@ void Viewer::addItem(QColor color)
 
 void Viewer::editItem(QListWidgetItem* item, QColor color)
 {
-	item->setText("");  //這裡只能把原有的輸入清掉
+	//item->setText("");
 	QPixmap pixmap(40, 40);
 	pixmap.fill(color);
 	QPainter painter(&pixmap);

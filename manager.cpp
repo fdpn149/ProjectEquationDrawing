@@ -84,7 +84,7 @@ void Manager::checkError(int nowRow)
 		{
 			for (string s : Storage::graphs.at(i)->postfix)
 			{
-				if (isalpha(s.at(0)) && s != "sin" && s != "cos" && s != "x" && s != "y")
+				if (isalpha(s.at(0)) && s != "sin" && s != "cos" && s != "tan" && s != "x" && s != "y")
 				{
 					if (var_before.find(s) == var_before.end())
 					{

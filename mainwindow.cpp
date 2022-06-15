@@ -50,13 +50,6 @@ void MainWindow::on_listWidget_itemDoubleClicked(QListWidgetItem* item)
 	manager.editItem(item, nowRow);
 }
 
-
-void MainWindow::on_pushButton_clicked()
-{
-
-}
-
-
 void MainWindow::on_listWidget_itemChanged(QListWidgetItem* item)
 {
 	int nowRow = ui->listWidget->indexFromItem(item).row();  //得到現在的列
