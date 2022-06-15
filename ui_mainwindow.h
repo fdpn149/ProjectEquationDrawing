@@ -67,7 +67,7 @@ public:
 
     void retranslateUi(QMainWindow *MainWindow)
     {
-        MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MainWindow", nullptr));
+        MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "Graphing", nullptr));
         addButton->setText(QCoreApplication::translate("MainWindow", "Add", nullptr));
     } // retranslateUi
 

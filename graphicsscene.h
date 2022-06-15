@@ -40,7 +40,6 @@ public:
 	void draw();					//繪製函數圖形
 	double to_view_y(double value);	//轉換xy坐標成畫面坐標
 	double to_view_x(double value);	//轉換xy坐標成畫面坐標
-	vector<double> calculateGraph(double first, double last, int count, int index, char type);	//計算出函數對應的x或y，存到vector
 private:
 	const int VIEW_WIDTH;	//介面寬度
 	const int VIEW_HEIGHT;	//介面高度
@@ -59,6 +58,7 @@ private:
 	void moveNumberBackward(deque<QGraphicsTextItem*>& text, const int& view_max, int x, int y,
 		double delta, char type);  //移動數字(向下、向右)
 	void keepNumber();  //讓數字保持在畫面中
+	vector<double> calculateGraph(double first, double last, int count, int index, char type);	//計算出函數對應的x或y，存到vector
 };
 
 #endif//GRAPHICSSCENE_H

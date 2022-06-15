@@ -173,14 +173,12 @@ void GraphicsScene::zoomScene(QPointF point, double scale)
 
 void GraphicsScene::moveGridForward(deque<QGraphicsLineItem*>& grid, const int& view_max, int& grid_min, int& grid_max, const int& line_end, char type, int distance)
 {
-	int range;  //迴圈跑的範圍
+	int range = 10;  //設定迴圈範圍的初始值為10
 	double new_xy;  //新的x或y
 	QGraphicsLineItem* nowItem;  //儲存現在的線物件(LineItem)
-	range = 10;  //設定迴圈範圍的初始值為10
 	for (int i = 0; i < range; i++)
 	{
-		nowItem = grid.at(i);  //現在物件設為第i個水平線物件
-		this->removeItem(nowItem);  //從畫面移除目前要調整的第i條線
+		nowItem = grid.at(i);  //現在物件設為第i個線物件
 		if (type == 'y')  //若是橫線
 			new_xy = nowItem->line().y1() + distance;  //設定new_xy為移動後的y坐標
 		else  //若是直線
@@ -191,8 +189,8 @@ void GraphicsScene::moveGridForward(deque<QGraphicsLineItem*>& grid, const int& 
 			new_xy = view_max + new_xy;  //將線移到畫面另一側，並補上超出去的部分
 			if (type == 'y')  //若是橫線
 			{
-				grid_min--;  //y格線的最小值減1
-				grid_max--;  //y格線的最大值減1
+				grid_min--;  //格線的最小值減1
+				grid_max--;  //格線的最大值減1
 				if (grid_min == 0)  //如果是第0條(x軸)
 					nowItem->setPen(axisPen);  //設定為坐標軸的筆
 				else
@@ -200,8 +198,8 @@ void GraphicsScene::moveGridForward(deque<QGraphicsLineItem*>& grid, const int& 
 			}
 			else  //若是直線
 			{
-				grid_min++;  //x格線的最小值加1
-				grid_max++;  //x格線的最大值加1
+				grid_min++;  //格線的最小值加1
+				grid_max++;  //格線的最大值加1
 				if (grid_max == 0)  //如果是第0條(y軸)
 					nowItem->setPen(axisPen);  //設定為坐標軸的筆
 				else
@@ -217,20 +215,17 @@ void GraphicsScene::moveGridForward(deque<QGraphicsLineItem*>& grid, const int& 
 			nowItem->setLine(0, new_xy, line_end, new_xy);  //設定線兩端的位置
 		else  //若是直線
 			nowItem->setLine(new_xy, 0, new_xy, line_end);  //設定線兩端的位置
-		this->addItem(nowItem);  //將移動後的線加到畫面上
 	}
 }
 
 void GraphicsScene::moveGridBackward(deque<QGraphicsLineItem*>& grid, const int& view_max, int& grid_min, int& grid_max, const int& line_end, char type, int distance)
 {
-	int range;  //迴圈跑的範圍
+	int range = 0;  //設定迴圈範圍的初始值為0
 	double new_xy;  //新的x或y
 	QGraphicsLineItem* nowItem;  //儲存現在的線物件(LineItem)
-	range = 0;  //設定迴圈範圍的初始值為0
 	for (int i = 9; i >= range; i--)
 	{
-		nowItem = grid.at(i);  //現在物件設為第i個水平線物件
-		this->removeItem(nowItem);  //從畫面移除目前要調整的第i條線
+		nowItem = grid.at(i);  //現在物件設為第i個線物件
 		if (type == 'y')  //若是橫線
 			new_xy = nowItem->line().y1() + distance;  //設定new_xy為移動後的y坐標
 		else  //若是直線
@@ -241,8 +236,8 @@ void GraphicsScene::moveGridBackward(deque<QGraphicsLineItem*>& grid, const int&
 			new_xy = new_xy - view_max;  //將線移到畫面另一側，並補上超出去的部分
 			if (type == 'y')  //若是橫線
 			{
-				grid_min++;  //y格線的最小值加1
-				grid_max++;  //y格線的最大值加1
+				grid_min++;  //格線的最小值加1
+				grid_max++;  //格線的最大值加1
 				if (grid_max == 0)  //如果是第0條(x軸)
 					nowItem->setPen(axisPen);  //設定為坐標軸的筆
 				else
@@ -250,8 +245,8 @@ void GraphicsScene::moveGridBackward(deque<QGraphicsLineItem*>& grid, const int&
 			}
 			else  //若是直線
 			{
-				grid_min--;  //x格線的最小值減1
-				grid_max--;  //x格線的最大值減1
+				grid_min--;  //格線的最小值減1
+				grid_max--;  //格線的最大值減1
 				if (grid_min == 0)  //如果是第0條(y軸)
 					nowItem->setPen(axisPen);  //設定為坐標軸的筆
 				else
@@ -267,37 +262,33 @@ void GraphicsScene::moveGridBackward(deque<QGraphicsLineItem*>& grid, const int&
 			nowItem->setLine(0, new_xy, line_end, new_xy);  //設定線兩端的位置
 		else  //若是直線
 			nowItem->setLine(new_xy, 0, new_xy, line_end);  //設定線兩端的位置
-		this->addItem(nowItem);  //將移動後的線加到畫面上
 	}
 }
 
 void GraphicsScene::moveNumberForward(deque<QGraphicsTextItem*>& text, const int& view_max, int x, int y, double delta, char type)
 {
-	int range = 10;
+	int range = 10;  //設定迴圈範圍的初始值為10
 	double new_x, new_y;  //新的x,新的y
-	QGraphicsTextItem* nowTextItem;
+	QGraphicsTextItem* nowTextItem;  //儲存現在的文字物件
 	for (int i = 0; i < range; i++)
 	{
-		nowTextItem = text.at(i);
-		this->removeItem(nowTextItem);
-		new_x = nowTextItem->pos().x() + x;
-		new_y = nowTextItem->pos().y() + y;
-		if ((type == 'x' && new_x < 0) || (type == 'y' && new_y < 0))
+		nowTextItem = text.at(i);  //現在物件設為第i個水平線物件
+		new_x = nowTextItem->pos().x() + x;  //設定新的x為移動後的x
+		new_y = nowTextItem->pos().y() + y;  //設定新的y為移動後的y
+		if ((type == 'x' && new_x < 0) || (type == 'y' && new_y < 0))  //若新的坐標小於0
 		{
-			if (type == 'x')	new_x = view_max + new_x;
-			else				new_y = view_max + new_y;
-			text.pop_front();
-			i--;
-			range--;
+			if (type == 'x')	new_x = view_max + new_x;  //移到畫面另一側，並補上超出去的部分
+			else				new_y = view_max + new_y;  //移到畫面另一側，並補上超出去的部分
+			text.pop_front();  //將text的第0項刪掉
+			i--;  //i減1(因為grid的順序改變，所以i要減1與i++抵消)
+			range--;  //迴圈執行範圍縮減(因為text的順序有改變，執行到原來的range會重複執行到)
 			nowTextItem->setPos(new_x, new_y);
 			nowTextItem->setPlainText(QString::number(text.at(text.size() - 1)->toPlainText().toDouble() + delta));
-			this->addItem(nowTextItem);
 			text.push_back(nowTextItem);
 		}
 		else
 		{
 			nowTextItem->setPos(new_x, new_y);
-			this->addItem(nowTextItem);
 		}
 	}
 }
@@ -310,7 +301,6 @@ void GraphicsScene::moveNumberBackward(deque<QGraphicsTextItem*>& text, const in
 	for (int i = 9; i >= range; i--)
 	{
 		nowTextItem = text.at(i);
-		this->removeItem(nowTextItem);
 		new_x = nowTextItem->pos().x() + x;
 		new_y = nowTextItem->pos().y() + y;
 		if ((type == 'x' && new_x > view_max) || (type == 'y' && new_y > view_max))
@@ -322,13 +312,11 @@ void GraphicsScene::moveNumberBackward(deque<QGraphicsTextItem*>& text, const in
 			range++;
 			nowTextItem->setPos(new_x, new_y);
 			nowTextItem->setPlainText(QString::number(text.at(0)->toPlainText().toDouble() + delta));
-			this->addItem(nowTextItem);
 			text.push_front(nowTextItem);
 		}
 		else
 		{
 			nowTextItem->setPos(new_x, new_y);
-			this->addItem(nowTextItem);
 		}
 	}
 }
@@ -344,9 +332,7 @@ void GraphicsScene::keepNumber()
 		for (int i = 0; i < 10; i++)
 		{
 			nowTextItem = text_y.at(i);
-			this->removeItem(nowTextItem);
 			nowTextItem->setPos(new_x, nowTextItem->pos().y());
-			this->addItem(nowTextItem);
 		}
 	}
 	else if (x_grid_max + x_grid_min < -9)
@@ -355,25 +341,23 @@ void GraphicsScene::keepNumber()
 		{
 			nowTextItem = text_y.at(i);
 			new_x = VIEW_WIDTH - nowTextItem->boundingRect().width();
-			this->removeItem(nowTextItem);
 			nowTextItem->setPos(new_x, nowTextItem->pos().y());
-			this->addItem(nowTextItem);
 		}
 	}
 	else
 	{
 		for (int i = 0; i < 10; i++)
+		{
 			if (grid_v.at(i)->pen() == axisPen)
 			{
 				new_x = grid_v.at(i)->line().x1();
 				break;
 			}
+		}
 		for (int i = 0; i < 10; i++)
 		{
 			nowTextItem = text_y.at(i);
-			this->removeItem(nowTextItem);
 			nowTextItem->setPos(new_x, nowTextItem->pos().y());
-			this->addItem(nowTextItem);
 		}
 	}
 
@@ -384,9 +368,7 @@ void GraphicsScene::keepNumber()
 		for (int i = 0; i < 10; i++)
 		{
 			nowTextItem = text_x.at(i);
-			this->removeItem(nowTextItem);
 			nowTextItem->setPos(nowTextItem->pos().x(), new_y);
-			this->addItem(nowTextItem);
 		}
 	}
 	else if (y_grid_max + y_grid_min > 9)
@@ -395,10 +377,7 @@ void GraphicsScene::keepNumber()
 		for (int i = 0; i < 10; i++)
 		{
 			nowTextItem = text_x.at(i);
-
-			this->removeItem(nowTextItem);
 			nowTextItem->setPos(nowTextItem->pos().x(), new_y);
-			this->addItem(nowTextItem);
 		}
 	}
 	else
@@ -412,9 +391,7 @@ void GraphicsScene::keepNumber()
 		for (int i = 0; i < 10; i++)
 		{
 			nowTextItem = text_x.at(i);
-			this->removeItem(nowTextItem);
 			nowTextItem->setPos(nowTextItem->pos().x(), new_y);
-			this->addItem(nowTextItem);
 		}
 	}
 }
@@ -447,7 +424,7 @@ vector<double> GraphicsScene::calculateGraph(double first, double last, int coun
 		}
 		catch (divided_by_zero) {  //若發生除以0
 			diByZero_count++;
-			data.push_back(std::numeric_limits<double>::infinity());
+			data.push_back(INF);
 			if (diByZero_count > count)  //如果函數的每一項都是除以0
 				throw;
 		}
@@ -456,10 +433,7 @@ vector<double> GraphicsScene::calculateGraph(double first, double last, int coun
 		}
 		catch (std::exception& e) {
 			string w = e.what();
-			if (w.at(0) == '-')
-				data.push_back(-std::numeric_limits<double>::infinity());
-			else
-				data.push_back(std::numeric_limits<double>::infinity());
+			data.push_back(INF);
 		}
 		xy += dxy;
 	}
@@ -472,11 +446,11 @@ void GraphicsScene::draw()
 	for (int i = 0; i < Storage::graphs.size(); i++)
 	{
 		try {
-			//若找到y=的項，而且狀態為顯示
+			//若找到y=或x=的項，而且狀態為顯示(status==1)
 			if (Storage::graphs.at(i)->status == 1 && (Storage::graphs.at(i)->name == "y" || Storage::graphs.at(i)->name == "x"))
 			{
 				vector<double> data;  //儲存函數值
-				double precision;  //x的精確度(間距)
+				double precision;  //精確度(多少間距繪一個點)
 
 				if (scaleValue > 1)  //若縮放倍率大於1
 					precision = PRECISION * scaleValue;  //精確度設為縮放倍率÷放大倍率
@@ -485,11 +459,12 @@ void GraphicsScene::draw()
 
 				QPainterPath path;  //儲存函數路徑
 
+				//繪製y=的函數
 				if (Storage::graphs.at(i)->name == "y")
 				{
 					data = calculateGraph(x_min, x_max, precision, i, 'y');  //計算y的值，存入data
 
-					double dx = (double)VIEW_WIDTH / precision;  //x在畫面的間距
+					double dx = (double)VIEW_WIDTH / precision;  //x的間距(畫面坐標)
 
 					double x = 0;  //畫面坐標x初始設為0
 					double y = to_view_y(data.at(0));  //畫面坐標y初始設為第0項的畫面坐標
@@ -497,123 +472,107 @@ void GraphicsScene::draw()
 					const double y_display_min = -2000;  //y能顯示的最小值
 
 					bool need_move = false;  //是否需要移動
-					double last_data;  //上一個y
-					if (y != INF && y != -INF && y <= y_display_max && y >= y_display_min)  //若y不為正負無限大
-					{
+
+					if (y != INF && y != -INF && y <= y_display_max && y >= y_display_min)  //若y不為正負無限大，且y沒有超出顯示範圍太多
 						path.moveTo(x, y);  //移動到(x,y)
-						last_data = data.at(0);
-					}
 					else
 						need_move = true;  //因為尚未移動，故將need_move設為true
 
 					for (int i = 1; i <= precision; i++)
 					{
-						x += dx;
-						y = to_view_y(data.at(i));
+						x += dx;  //x設為下一個x
+						y = to_view_y(data.at(i));  //y設為轉換後的坐標
 
-						if (need_move)
+						if (need_move)  //若需要移動
 						{
-							if (y != INF && y != -INF && y <= y_display_max && y >= y_display_min)
+							if (y != INF && y != -INF && y <= y_display_max && y >= y_display_min)  //若y不為正負無限大，且y沒有超出顯示範圍太多
 							{
-								path.moveTo(x, y);
-								need_move = false;
-								last_data = data.at(i);
+								path.moveTo(x, y);  //移動到(x,y)
+								need_move = false;  //不需要再移動了
 							}
 						}
-						else
+						else  //不需移動
 						{
-							if (y == INF || y == -INF || y > y_display_max || y < y_display_min)
-							{
-								need_move = true;
-							}
-							else
-							{
-								path.lineTo(x, y);
-								last_data = data.at(i);
-							}
+							if (y == INF || y == -INF || y > y_display_max || y < y_display_min)  //若y為正負無限大，或y超出顯示範圍太多
+								need_move = true;  //需要重新下筆
+							else  //y是有效的
+								path.lineTo(x, y);  //將線連到(x,y)
 						}
 					}
 				}
+				//繪製x=的函數
 				else
 				{
-					data = calculateGraph(y_min, y_max, precision, i, 'x');  //計算y的值，存入data
+					data = calculateGraph(y_min, y_max, precision, i, 'x');  //計算x的值，存入data
 
-					double dy = -(double)VIEW_HEIGHT / precision;  //x在畫面的間距
+					double dy = -(double)VIEW_HEIGHT / precision;  //y的間距(畫面坐標)
 
-					double x = to_view_x(data.at(0));  //畫面坐標x初始設為0
-					double y = VIEW_HEIGHT;  //畫面坐標y初始設為第0項的畫面坐標
-					const double x_display_max = 2000;  //y能顯示的最大值
-					const double x_display_min = -2000;  //y能顯示的最小值
+					double x = to_view_x(data.at(0));  //畫面坐標x初始設為第0項的畫面坐標
+					double y = VIEW_HEIGHT;  //畫面坐標y初始設為畫面高度
+					const double x_display_max = 2000;  //x能顯示的最大值
+					const double x_display_min = -2000;  //x能顯示的最小值
 
 					bool need_move = false;  //是否需要移動
-					double last_data;  //上一個y
-					if (x != INF && x != -INF && x <= x_display_max && x >= x_display_min)  //若y不為正負無限大
-					{
+
+					if (x != INF && x != -INF && x <= x_display_max && x >= x_display_min)  //若x不為正負無限大，且x沒有超出顯示範圍太多
 						path.moveTo(x, y);  //移動到(x,y)
-						last_data = data.at(0);
-					}
 					else
 						need_move = true;  //因為尚未移動，故將need_move設為true
 
 					for (int i = 1; i <= precision; i++)
 					{
-						y += dy;
-						x = to_view_x(data.at(i));
+						y += dy;  //y設為下一個y
+						x = to_view_x(data.at(i));  //x設為轉換後的坐標
 
-						if (need_move)
+						if (need_move)  //若需要移動
 						{
-							if (x != INF && x != -INF && x <= x_display_max && x >= x_display_min)
+							if (x != INF && x != -INF && x <= x_display_max && x >= x_display_min)  //若x不為正負無限大，且x沒有超出顯示範圍太多
 							{
-								path.moveTo(x, y);
-								need_move = false;
-								last_data = data.at(i);
+								path.moveTo(x, y);  //移動到(x,y)
+								need_move = false;  //不需要再移動了
 							}
 						}
-						else
+						else  //不需移動
 						{
-							if (x == INF || x == -INF || x > x_display_max || x < x_display_min)
-							{
-								need_move = true;
-							}
-							else
-							{
-								path.lineTo(x, y);
-								last_data = data.at(i);
-							}
+							if (x == INF || x == -INF || x > x_display_max || x < x_display_min)  //若x為正負無限大，或x超出顯示範圍太多
+								need_move = true;  //需要重新下筆
+							else  //x是有效的
+								path.lineTo(x, y);  //將線連到(x,y)
 						}
 					}
 				}
-				QGraphicsPathItem* pathItem;
-				if (Storage::graphs.at(i)->graph != nullptr)
+				QGraphicsPathItem* pathItem;  //指向路徑物件的指標
+				if (Storage::graphs.at(i)->graph != nullptr)  //若已經有存在的圖形
 				{
-					pathItem = Storage::graphs.at(i)->graph;
-					this->removeItem(Storage::graphs.at(i)->graph);
+					pathItem = Storage::graphs.at(i)->graph;  //指向存在的圖形
+					this->removeItem(Storage::graphs.at(i)->graph);  //先刪除畫面上的圖形
 				}
 				else
-					pathItem = new QGraphicsPathItem();
-				pathItem->setPath(path);
-				QPen pen;
-				pen.setColor(Storage::graphs.at(i)->color);
-				pen.setWidth(2);
-				pathItem->setPen(pen);
-
-				Storage::graphs.at(i)->graph = pathItem;
-				this->addItem(pathItem);
+				{
+					pathItem = new QGraphicsPathItem();  //䢖立一個新的物件
+					QPen pen;  //建立一支畫筆
+					pen.setColor(Storage::graphs.at(i)->color);  //設定顏色為那個函數的顏色
+					pen.setWidth(2);  //設定筆刷寬度為2
+					pathItem->setPen(pen);  //設定路徑物件的畫筆
+				}
+				pathItem->setPath(path);  //設定路徑為剛剛畫好的path
+				Storage::graphs.at(i)->graph = pathItem;  //儲存圖形
+				this->addItem(pathItem);  //在畫面上加上剛剛畫好的圖形
 			}
 		}
-		catch (divided_by_zero) {
-			manager.removeGraph(i);
+		catch (divided_by_zero) {  //若每一項都為÷0
+			manager.removeGraph(i);  //刪除函數
 		}
-		catch (variable_error) {
-			manager.removeGraph(i);
+		catch (variable_error) {  //變數有誤
+			manager.removeGraph(i);  //刪除函數
 		}
 	}
 }
 
 void GraphicsScene::removeGraph(int index)
 {
-	if (Storage::graphs.at(index)->graph != nullptr)
-		this->removeItem(Storage::graphs.at(index)->graph);
-	delete Storage::graphs.at(index)->graph;
-	Storage::graphs.at(index)->graph = nullptr;
+	if (Storage::graphs.at(index)->graph != nullptr)  //若已經有存在的圖形
+		this->removeItem(Storage::graphs.at(index)->graph);  //刪除畫面上的圖形
+	delete Storage::graphs.at(index)->graph;  //刪除儲存的路徑物件
+	Storage::graphs.at(index)->graph = nullptr;  //將原本儲存物件的位置設為null
 }
