@@ -410,6 +410,14 @@ double GraphicsScene::to_view_x(double value)
 	return (value - x_min) * VIEW_WIDTH / (x_max - x_min);  //回傳轉換後的數值
 }
 
+void GraphicsScene::removeGraph(int index)
+{
+	if (Storage::graphs.at(index)->graph != nullptr)  //若已經有存在的圖形
+		this->removeItem(Storage::graphs.at(index)->graph);  //刪除畫面上的圖形
+	delete Storage::graphs.at(index)->graph;  //刪除儲存的路徑物件
+	Storage::graphs.at(index)->graph = nullptr;  //將原本儲存物件的位置設為null
+}
+
 vector<double> GraphicsScene::calculateGraph(double first, double last, int count, int index, char type)
 {
 	vector<double> data;  //存函數數值
@@ -567,12 +575,4 @@ void GraphicsScene::draw()
 			manager.removeGraph(i);  //刪除函數
 		}
 	}
-}
-
-void GraphicsScene::removeGraph(int index)
-{
-	if (Storage::graphs.at(index)->graph != nullptr)  //若已經有存在的圖形
-		this->removeItem(Storage::graphs.at(index)->graph);  //刪除畫面上的圖形
-	delete Storage::graphs.at(index)->graph;  //刪除儲存的路徑物件
-	Storage::graphs.at(index)->graph = nullptr;  //將原本儲存物件的位置設為null
 }

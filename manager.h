@@ -24,7 +24,7 @@ public:
 	void removeGraph(int index);
 	double calculate(double num, char type, int index);
 	void showGraph();
-	void checkError(int nowRow);  //檢查nowRow之後的錯誤
+	void checkError(int nowRow);
 };
 
 extern Manager manager;

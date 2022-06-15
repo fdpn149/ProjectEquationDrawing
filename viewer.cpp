@@ -12,17 +12,6 @@ Viewer::Viewer()
 	window.show();
 }
 
-void Viewer::changeText(string str)
-{
-	system("cls");
-	cout << str + " ";
-}
-
-void Viewer::addText(string str)
-{
-	cout << str + " ";
-}
-
 void Viewer::addItem(QColor color)
 {
 	QPixmap pixmap(40, 40);
@@ -33,7 +22,7 @@ void Viewer::addItem(QColor color)
 	QListWidgetItem* item = new QListWidgetItem("");
 	item->setIcon(pixmap);
 	item->setFont(QFont("Microsoft JhengHei UI", 20));
-	item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+	item->setFlags(item->flags() | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
 	item->setCheckState(Qt::Checked);
     window.ui->listWidget->addItem(item);
 }

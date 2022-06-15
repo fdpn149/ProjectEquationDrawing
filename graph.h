@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <iostream>
 #include <QColor>
 #include <vector>
@@ -13,7 +13,7 @@ public:
 	vector<string> postfix;
 	QColor color;
 	QGraphicsPathItem* graph;
-	int status;  //-1:Error, 0:empty, 1:correct
+	int status;  //-1:錯誤, 0:不顯示, 1:正常
 
 	Graph(QColor c) : color(c), graph(nullptr), status(1) {}
 	void clear();

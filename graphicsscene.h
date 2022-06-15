@@ -19,6 +19,19 @@ class GraphicsScene : public QGraphicsScene
 public:
 	GraphicsScene(QObject* parent, int width, int height);
 	~GraphicsScene();
+	void zoomScene(QPointF point, double scale);  //縮放畫面
+	void moveScene(int x, int y);	//移動畫面
+	void removeGraph(int index);	//刪除函數圖形
+	void draw();					//繪製函數圖形
+	double to_view_y(double value);	//轉換xy坐標成畫面坐標
+	double to_view_x(double value);	//轉換xy坐標成畫面坐標
+private:
+	const int VIEW_WIDTH;	//介面寬度
+	const int VIEW_HEIGHT;	//介面高度
+	const int CENTER_X;		//中心的X坐標
+	const int CENTER_Y;		//中心的Y坐標
+	const double PRECISION = 500;	//描點準確度
+	const double INF = std::numeric_limits<double>::infinity();	//定義INF為double的無限大
 	double scaleValue = 1;	//縮放的比例(無縮放為1,放大<1,縮小>1)
 	int x_grid_min = -5;	//x格線的最小值
 	int x_grid_max = 4;		//x格線的最大值
@@ -34,19 +47,6 @@ public:
 	deque<QGraphicsLineItem*> grid_v;	//垂直格線
 	deque<QGraphicsTextItem*> text_x;	//x軸數字
 	deque<QGraphicsTextItem*> text_y;	//y軸數字
-	void zoomScene(QPointF point, double scale);  //縮放畫面
-	void moveScene(int x, int y);	//移動畫面
-	void removeGraph(int index);	//刪除函數圖形
-	void draw();					//繪製函數圖形
-	double to_view_y(double value);	//轉換xy坐標成畫面坐標
-	double to_view_x(double value);	//轉換xy坐標成畫面坐標
-private:
-	const int VIEW_WIDTH;	//介面寬度
-	const int VIEW_HEIGHT;	//介面高度
-	const int CENTER_X;		//中心的X坐標
-	const int CENTER_Y;		//中心的Y坐標
-	const double PRECISION = 500;	//描點準確度
-	const double INF = std::numeric_limits<double>::infinity();	//定義INF為double的無限大
 	QPen axisPen;  //畫坐標軸的筆
 	QPen gridPen;  //畫其它格線的筆
 	void moveGridForward(deque<QGraphicsLineItem*>& grid, const int& view_max, int& grid_min, int& grid_max,

@@ -4,6 +4,11 @@ using std::stack;
 using std::stod;
 using std::to_string;
 
+Parser::Parser()
+{
+
+}
+
 bool Parser::isVarNum(string str)
 {
 	if (str == "sin" || str == "cos" || str == "tan")
@@ -34,11 +39,6 @@ bool Parser::isOperator(string str)
 		return true;
 
 	return false;
-}
-
-Parser::Parser()
-{
-
 }
 
 string Parser::getVarName(string input)
@@ -75,8 +75,8 @@ string Parser::parseInput(string input, Storage& storage, int nowRow)
 		Storage::graphs.rend(), var) != Storage::graphs.rend()) return "";  //變數重複定義
 
 	int par_count = 0;  //計算上下括號數
+	int now_code = 0;  //現在的字元代碼
 	int next_code = 59;  //下一個有效字元的代碼 #初始為(-0sa
-	int now_code = 0;
 
 	for (int i = eq_pos + 1; i < input.size(); i++)
 	{
@@ -87,10 +87,9 @@ string Parser::parseInput(string input, Storage& storage, int nowRow)
 			now_code = 1;
 			next_code = 59;  //(-0sa
 			storage.infix.push("(");
-			continue;
 		}
 		//若是負號或減號
-		if ((next_code & 2) >= 1 && input.at(i) == '-')
+		else if ((next_code & 2) >= 1 && input.at(i) == '-')
 		{
 			if (now_code == 0 || now_code == 1)  //是=或(
 				storage.infix.push("--");  //負號
@@ -98,19 +97,17 @@ string Parser::parseInput(string input, Storage& storage, int nowRow)
 				storage.infix.push("-");  //減號
 			now_code = 2;
 			next_code = 57;  //(0sa
-			continue;
 		}
 		//加乘除冪
-		if ((next_code & 4) >= 1 && (input.at(i) == '+' || input.at(i) == '*'
+		else if ((next_code & 4) >= 1 && (input.at(i) == '+' || input.at(i) == '*'
 			|| input.at(i) == '/' || input.at(i) == '^'))
 		{
 			now_code = 4;
 			next_code = 57;  //(0sa
 			storage.infix.push(string(1, input.at(i)));
-			continue;
 		}
 		//數字
-		if ((next_code & 8) >= 1 && std::isdigit(input.at(i)))
+		else if ((next_code & 8) >= 1 && std::isdigit(input.at(i)))
 		{
 			int from = i;  //數字的第0個字
 
@@ -134,12 +131,11 @@ string Parser::parseInput(string input, Storage& storage, int nowRow)
 			i--;
 
 			storage.infix.push(str);
-			continue;
 		}
-		//英文(sin/cos=16, 其它=32)
-		if ((next_code & 48) >= 1 && std::isalpha(input.at(i)))
+		//英文(sin/cos/tan=16, 其它=32)
+		else if ((next_code & 48) >= 1 && std::isalpha(input.at(i)))
 		{
-			//sin/cos判斷
+			//sin/cos/tan判斷
 			if (input.substr(i, 3) == "sin" || input.substr(i, 3) == "cos" || input.substr(i, 3) == "tan")
 			{
 				if ((next_code & 16) >= 1 && i + 3 < input.length() && input.at(i + 3) == '(')  //若sin/cos的下個字為(
@@ -179,10 +175,9 @@ string Parser::parseInput(string input, Storage& storage, int nowRow)
 			storage.infix.push(name);
 			now_code = 32;
 			next_code = 70;  //-+)
-			continue;
 		}
 		//右括號
-		if ((next_code & 64) >= 1 && input.at(i) == ')')
+		else if ((next_code & 64) >= 1 && input.at(i) == ')')
 		{
 			par_count--;
 
@@ -191,20 +186,16 @@ string Parser::parseInput(string input, Storage& storage, int nowRow)
 			now_code = 64;
 			next_code = 70;  //-+)
 			storage.infix.push(")");
-			continue;
 		}
-
-		return "";
+		else
+			return "";
 	}
 
 	if (par_count > 0)
 		return "";
 
-
-
-	if ((now_code & 104) == 0)
+	if ((now_code & 104) == 0)  //0a)
 		return "";
-
 
 	return var;
 }

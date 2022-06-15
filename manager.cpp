@@ -18,10 +18,34 @@ Manager::~Manager()
 	delete viewer;
 }
 
+void Manager::start()
+{
+	viewer = new Viewer();
+}
+
 void Manager::clearQueue(queue<string>& q)
 {
 	queue<string> empty;
 	swap(empty, q);
+}
+
+void Manager::addNewItem()
+{
+	int r = rand() % 256;
+	int g = rand() % 256;
+	int b = rand() % 256;
+
+	//限制顏色深淺(綠色*3+紅色*2+藍色*1)
+	while (g * 3 + r * 2 + b > 1000 || g * 3 + r * 2 + b < 192)
+	{
+		r = rand() % 256;
+		g = rand() % 256;
+		b = rand() % 256;
+	}
+	QColor col = QColor(r, g, b);
+	viewer->addItem(col);
+	Graph* newGraph = new Graph(col);
+	Storage::graphs.push_back(newGraph);
 }
 
 void Manager::input(string input, QListWidgetItem* item, int nowRow)
@@ -114,34 +138,8 @@ void Manager::checkError(int nowRow)
 	}
 }
 
-void Manager::start()
-{
-	viewer = new Viewer();
-}
-
-
-void Manager::addNewItem()
-{
-	int r = rand() % 256;
-	int g = rand() % 256;
-	int b = rand() % 256;
-
-	//限制顏色深淺(綠色*3+紅色*2+藍色*1)
-	while (g * 3 + r * 2 + b > 1086 || g * 3 + r * 2 + b < 192)
-	{
-		r = rand() % 256;
-		g = rand() % 256;
-		b = rand() % 256;
-	}
-	QColor col = QColor(r, g, b);
-	viewer->addItem(col);
-	Graph* newGraph = new Graph(col);
-	Storage::graphs.push_back(newGraph);
-}
-
 void Manager::editItem(QListWidgetItem* item, int nowRow)
 {
-	item->setFlags(item->flags() | Qt::ItemIsEditable);
 	viewer->editItem(item, Storage::graphs.at(nowRow)->color);
 }
 
