@@ -109,8 +109,6 @@ void GraphicsScene::moveScene(int x, int y)
 
 	/*超出邊界時需吸付在邊邊*/
 	keepNumber();
-
-	manager.showGraph();  //顯示函數圖形
 }
 
 void GraphicsScene::zoomScene(QPointF point, double scale)

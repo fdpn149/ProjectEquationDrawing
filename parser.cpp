@@ -125,7 +125,7 @@ string Parser::parseInput(string input, Storage& storage, int nowRow)
 				return "";  //輸入有誤
 
 			now_code = 8;
-			next_code = 78;  //-+0)
+			next_code = 70;  //-+)
 
 			string str = input.substr(from, i - from);  //截取
 			i--;

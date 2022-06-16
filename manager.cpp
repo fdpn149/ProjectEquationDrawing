@@ -72,7 +72,6 @@ void Manager::input(string input, QListWidgetItem* item, int nowRow)
 		Storage::graphs.at(nowRow)->status = -1;
 		if (origin_name == "y" || origin_name == "x")
 			viewer->removeGraph(nowRow);
-		clearQueue(storage.infix);
 	}
 }
 

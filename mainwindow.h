@@ -20,7 +20,6 @@ private slots:
     void on_addButton_clicked();
     void on_listWidget_itemDoubleClicked(QListWidgetItem *item);
     void on_listWidget_itemChanged(QListWidgetItem *item);
-private:
     void on_listWidget_commitData();
 };
 #endif // MAINWINDOW_H

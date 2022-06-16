@@ -1,4 +1,5 @@
 ﻿#include "graphicsview.h"
+#include "manager.h"
 #include <iostream>
 #include <cstdlib>
 
@@ -38,7 +39,7 @@ void GraphicsView::mouseMoveEvent(QMouseEvent* event)
         const int deltaY = event->position().y() - lastPosition.y();
 
         scene->moveScene(deltaX-lastDeltaX, deltaY-lastDeltaY);
-
+        manager.showGraph();  //顯示函數圖形
         lastDeltaX = deltaX;
         lastDeltaY = deltaY;
     }
@@ -55,5 +56,5 @@ void GraphicsView::wheelEvent(QWheelEvent* event)
     QPointF now_pos = event->position();  //現在滑鼠在畫面上的位置
 
     scene->zoomScene(now_pos, factor);  //縮放畫面
-
+    manager.showGraph();  //顯示函數圖形
 }
